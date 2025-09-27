@@ -271,7 +271,7 @@ document.addEventListener('click', () => {
 // ===============================
 // PRODUCT SLIDER TOUCH
 // ===============================
-
+window.addEventListener('load', () => {
   let productsStyle = window.getComputedStyle(products[0])
   let prodGap = parseInt(productsStyle.marginRight) || 0
   let prodWidth = products[0].offsetWidth + prodGap
@@ -288,3 +288,4 @@ document.addEventListener('click', () => {
   productTrack2.addEventListener('touchstart', (e) => { touchstart(e, productTrack2) })
   productTrack2.addEventListener('touchmove', (e) => { touchmove(e, prodWidth2, productTrack2, prodIndex2Ref) })
   productTrack2.addEventListener('touchend', () => { touchend(productTrack2, products2, prodWidth2, slideDots2, prodIndex2Ref) })
+})
