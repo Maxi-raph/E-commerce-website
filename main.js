@@ -3,9 +3,9 @@
 // ===============================
 const heading = document.querySelector('#home-text h2')
 const paragraph = document.querySelector('#home-text p')
-const slideContain = document.querySelector('.slide-contain')
-const slideContents = document.querySelectorAll('.slide-content')
-const slidesTrack = document.querySelector('.slides-track')
+const heroContain = document.querySelector('.slide-contain')
+const heroContents = document.querySelectorAll('.slide-content')
+const heroTrack = document.querySelector('.slides-track')
 const hamburger = document.getElementById('hamburger')
 
 const features = document.querySelectorAll('.features')
@@ -32,7 +32,9 @@ const slideDots2 = document.querySelectorAll('.slider-dots2')
 // ===============================
 // SLIDER HELPERS
 // ===============================
-let index = 0
+let heroIndexRef = { value: 0 }
+let prodIndexRef = { value: 0 }
+let prodIndex2Ref = { value: 0 }
 let startX = 0
 let endX = 0
 
@@ -41,44 +43,43 @@ function touchstart(event, track) {
   track.style.transition = 'none'
 }
 
-function touchmove(event, width, track) {
+function touchmove(event, width, track,indexRef) {
   endX = event.touches[0].clientX
   delta = endX - startX
-  let offset = -index * width + delta
+  let offset = -indexRef.value * width + delta
   track.style.transform = `translateX(${offset}px)`
 }
 
-function touchend(track, contents, width, dots = []) {
+function touchend(track, contents, width, dots = [],indexRef) {
   delta = endX - startX
-  
-  if (delta < -50 && index < contents.length - 2) {
-    index++
-  } else if (delta > 50 && index > 0) {
-    index--
+  if (delta < -50 && indexRef.value < contents.length - 2) {
+    indexRef.value++
+  } else if (delta > 50 && indexRef.value > 0) {
+    indexRef.value--
   }
   
   track.style.transition = 'transform 0.6s ease'
-  track.style.transform = `translateX(${-index * width}px)`
+  track.style.transform = `translateX(${-indexRef.value * width}px)`
   
   dots.forEach(dot => {
     dot.classList.remove('bg-stone-400')
-    dots[index].classList.add('bg-stone-400')
+    dots[indexRef.value].classList.add('bg-stone-400')
   })
 }
 
-function slidesTouchend(track, contents, width) {
+function heroTouchend(track, contents, width,indexRef) {
   delta = endX - startX
-  
-  if (delta < -50 && index < contents.length) {
-    index++
-    if (index == contents.length) index = 0
-  } else if (delta > 50 && index > -1) {
-    index--
-    if (index == -1) index = contents.length - 1
+  console.log(indexRef)
+  if (delta < -50 && indexRef.value < contents.length) {
+    indexRef.value++
+    if (indexRef.value == contents.length) indexRef.value = 0
+  } else if (delta > 50 && indexRef.value > -1) {
+    indexRef.value--
+    if (indexRef.value == -1) indexRef.value = contents.length - 1
   }
   
   track.style.transition = 'transform 0.6s ease'
-  track.style.transform = `translateX(${-index * width}px)`
+  track.style.transform = `translateX(${-indexRef.value * width}px)`
 }
 
 
@@ -97,8 +98,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }, 200)
   
   setTimeout(() => {
-    slideContain.classList.replace('translate-y-32', 'translate-y-0')
-    slideContain.classList.add('opacity-100')
+    heroContain.classList.replace('translate-y-32', 'translate-y-0')
+    heroContain.classList.add('opacity-100')
   }, 300)
 })
 
@@ -106,20 +107,20 @@ document.addEventListener("DOMContentLoaded", () => {
 // ===============================
 // SLIDE TOUCH HANDLERS
 // ===============================
-let slideStyle = window.getComputedStyle(slideContents[0])
-let gap = parseInt(slideStyle.marginRight) || 0
-let slideWidth = slideContents[0].offsetWidth + gap
+let heroStyle = window.getComputedStyle(heroContents[0])
+let gap = parseInt(heroStyle.marginRight) || 0
+let heroWidth = heroContents[0].offsetWidth + gap
 
-slideContents.forEach(content => {
+heroContents.forEach(content => {
   content.addEventListener('touchstart', (e) => {
     let img = e.currentTarget.querySelector('img')
     img.classList.toggle('scale-95')
   })
 })
 
-slidesTrack.addEventListener('touchstart', (e) => { touchstart(e, slidesTrack) })
-slidesTrack.addEventListener('touchmove', (e) => { touchmove(e, slideWidth, slidesTrack) })
-slidesTrack.addEventListener('touchend', () => { slidesTouchend(slidesTrack, slideContents, slideWidth) })
+heroTrack.addEventListener('touchstart', (e) => { touchstart(e, heroTrack) })
+heroTrack.addEventListener('touchmove', (e) => { touchmove(e, heroWidth, heroTrack,heroIndexRef) })
+heroTrack.addEventListener('touchend', () => { heroTouchend(heroTrack, heroContents, heroWidth,heroIndexRef) })
 
 
 // ===============================
@@ -163,7 +164,9 @@ let observer3 = new IntersectionObserver((entries) => {
 let trackObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
     if (!entry.isIntersecting) {
-      index = 0
+      heroIndexRef.value = 0
+      prodIndexRef.value = 0
+      prodIndex2Ref.value = 0
       productTrack.style.transition = 'transform 0.6s ease'
       productTrack.style.transform = `translateX(0px)`
       slideDots.forEach(dot => dot.classList.remove('bg-stone-400'))
@@ -172,8 +175,8 @@ let trackObserver = new IntersectionObserver((entries) => {
       productTrack2.style.transform = `translateX(0px)`
       slideDots2.forEach(dot => dot.classList.remove('bg-stone-400'))
       slideDots2[0].classList.add('bg-stone-400')
-      slidesTrack.style.transition = 'transform 0.6s ease'
-      slidesTrack.style.transform = `translateX(0px)`
+      heroTrack.style.transition = 'transform 0.6s ease'
+      heroTrack.style.transform = `translateX(0px)`
     }
   })
 }, { threshold: 0 })
@@ -181,7 +184,7 @@ let trackObserver = new IntersectionObserver((entries) => {
 productsContainer.forEach(container => {
   trackObserver.observe(container)
 })
-trackObserver.observe(slideContain)
+trackObserver.observe(heroContain)
 
 productsContainer.forEach(container => observer3.observe(container))
 
@@ -273,8 +276,8 @@ let prodGap = parseInt(productsStyle.marginRight) || 0
 let prodWidth = products[0].offsetWidth + prodGap
 
 productTrack.addEventListener('touchstart', (e) => { touchstart(e, productTrack) })
-productTrack.addEventListener('touchmove', (e) => { touchmove(e, prodWidth, productTrack) })
-productTrack.addEventListener('touchend', () => { touchend(productTrack, products, prodWidth, slideDots) })
+productTrack.addEventListener('touchmove', (e) => { touchmove(e, prodWidth, productTrack,prodIndexRef) })
+productTrack.addEventListener('touchend', () => { touchend(productTrack, products, prodWidth, slideDots,prodIndexRef) })
 
 
 let productsStyle2 = window.getComputedStyle(products2[0])
@@ -282,5 +285,5 @@ let prodGap2 = parseInt(productsStyle2.marginRight) || 0
 let prodWidth2 = products2[0].offsetWidth + prodGap2
 
 productTrack2.addEventListener('touchstart', (e) => { touchstart(e, productTrack2) })
-productTrack2.addEventListener('touchmove', (e) => { touchmove(e, prodWidth2, productTrack2) })
-productTrack2.addEventListener('touchend', () => { touchend(productTrack2, products2, prodWidth2, slideDots2) })
+productTrack2.addEventListener('touchmove', (e) => { touchmove(e, prodWidth2, productTrack2,prodIndex2Ref) })
+productTrack2.addEventListener('touchend', () => { touchend(productTrack2, products2, prodWidth2, slideDots2,prodIndex2Ref) })
