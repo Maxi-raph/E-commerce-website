@@ -71,10 +71,20 @@ function heroTouchend(track, contents, width, indexRef) {
   delta = endX - startX
   if (delta < -50 && indexRef.value < contents.length) {
     indexRef.value++
-    if (indexRef.value == contents.length) indexRef.value = 0
+    if (indexRef.value == contents.length) {
+      indexRef.value = 0
+      track.style.transition = 'none'
+      track.style.transform = `translateX(${-indexRef.value * width}px)`
+      return
+    }
   } else if (delta > 50 && indexRef.value > -1) {
     indexRef.value--
-    if (indexRef.value == -1) indexRef.value = contents.length - 1
+    if (indexRef.value == -1) {
+      indexRef.value = contents.length - 1
+      track.style.transition = 'none'
+      track.style.transform = `translateX(${-indexRef.value * width}px)`
+      return
+    }
   }
   
   track.style.transition = 'transform 0.6s ease'
@@ -275,7 +285,6 @@ window.addEventListener('load', () => {
   let productsStyle = window.getComputedStyle(products[0])
   let prodGap = parseInt(productsStyle.marginRight) || 0
   let prodWidth = products[0].offsetWidth + prodGap
-  
   productTrack.addEventListener('touchstart', (e) => { touchstart(e, productTrack) })
   productTrack.addEventListener('touchmove', (e) => { touchmove(e, prodWidth, productTrack, prodIndexRef) })
   productTrack.addEventListener('touchend', () => { touchend(productTrack, products, prodWidth, slideDots, prodIndexRef) })
