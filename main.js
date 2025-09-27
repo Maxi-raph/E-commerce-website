@@ -43,21 +43,21 @@ function touchstart(event, track) {
   track.style.transition = 'none'
 }
 
-function touchmove(event, width, track,indexRef) {
+function touchmove(event, width, track, indexRef) {
   endX = event.touches[0].clientX
   delta = endX - startX
   let offset = -indexRef.value * width + delta
   track.style.transform = `translateX(${offset}px)`
 }
 
-function touchend(track, contents, width, dots = [],indexRef) {
+function touchend(track, contents, width, dots = [], indexRef) {
   delta = endX - startX
+  if (event.target.classList.contains('hearts') || event.target.classList.contains('hearts2')) return
   if (delta < -50 && indexRef.value < contents.length - 2) {
     indexRef.value++
   } else if (delta > 50 && indexRef.value > 0) {
     indexRef.value--
   }
-  
   track.style.transition = 'transform 0.6s ease'
   track.style.transform = `translateX(${-indexRef.value * width}px)`
   
@@ -67,7 +67,7 @@ function touchend(track, contents, width, dots = [],indexRef) {
   })
 }
 
-function heroTouchend(track, contents, width,indexRef) {
+function heroTouchend(track, contents, width, indexRef) {
   delta = endX - startX
   if (delta < -50 && indexRef.value < contents.length) {
     indexRef.value++
@@ -104,7 +104,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 // ===============================
-// SLIDE TOUCH HANDLERS
+// HERO TOUCH HANDLERS
 // ===============================
 let heroStyle = window.getComputedStyle(heroContents[0])
 let gap = parseInt(heroStyle.marginRight) || 0
@@ -118,8 +118,8 @@ heroContents.forEach(content => {
 })
 
 heroTrack.addEventListener('touchstart', (e) => { touchstart(e, heroTrack) })
-heroTrack.addEventListener('touchmove', (e) => { touchmove(e, heroWidth, heroTrack,heroIndexRef) })
-heroTrack.addEventListener('touchend', () => { heroTouchend(heroTrack, heroContents, heroWidth,heroIndexRef) })
+heroTrack.addEventListener('touchmove', (e) => { touchmove(e, heroWidth, heroTrack, heroIndexRef) })
+heroTrack.addEventListener('touchend', () => { heroTouchend(heroTrack, heroContents, heroWidth, heroIndexRef) })
 
 
 // ===============================
@@ -160,6 +160,8 @@ let observer3 = new IntersectionObserver((entries) => {
   })
 }, { threshold: 1 })
 
+productsContainer.forEach(container => observer3.observe(container))
+
 let trackObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
     if (!entry.isIntersecting) {
@@ -183,9 +185,8 @@ let trackObserver = new IntersectionObserver((entries) => {
 productsContainer.forEach(container => {
   trackObserver.observe(container)
 })
-trackObserver.observe(heroContain)
 
-productsContainer.forEach(container => observer3.observe(container))
+trackObserver.observe(heroContain)
 
 
 // ===============================
@@ -201,7 +202,7 @@ products.forEach(product => {
     
     if (hideCash.classList.contains('translate-y-[-20px]')) {
       if (e.target.classList.contains('hearts')) {
-        e.target.classList.add('text-red-500')
+        e.target.classList.toggle('text-red-500')
         e.target.classList.remove('hidden')
         //I'll add the favorites in an array here so that once i click the heart icon at the top, i'll go to a site where all the favourites are in a row
         return
@@ -227,7 +228,7 @@ products2.forEach(product => {
     
     if (hideCash.classList.contains('translate-y-[-20px]')) {
       if (e.target.classList.contains('hearts2')) {
-        e.target.classList.add('text-red-500')
+        e.target.classList.toggle('text-red-500')
         e.target.classList.remove('hidden')
         //I'll add the favorites in an array here so that once i click the heart icon at the top, i'll go to a site where all the favourites are in a row
         return
@@ -270,19 +271,21 @@ document.addEventListener('click', () => {
 // ===============================
 // PRODUCT SLIDER TOUCH
 // ===============================
-let productsStyle = window.getComputedStyle(products[0])
-let prodGap = parseInt(productsStyle.marginRight) || 0
-let prodWidth = products[0].offsetWidth + prodGap
-
-productTrack.addEventListener('touchstart', (e) => { touchstart(e, productTrack) })
-productTrack.addEventListener('touchmove', (e) => { touchmove(e, prodWidth, productTrack,prodIndexRef) })
-productTrack.addEventListener('touchend', () => { touchend(productTrack, products, prodWidth, slideDots,prodIndexRef) })
-
-
-let productsStyle2 = window.getComputedStyle(products2[0])
-let prodGap2 = parseInt(productsStyle2.marginRight) || 0
-let prodWidth2 = products2[0].offsetWidth + prodGap2
-
-productTrack2.addEventListener('touchstart', (e) => { touchstart(e, productTrack2) })
-productTrack2.addEventListener('touchmove', (e) => { touchmove(e, prodWidth2, productTrack2,prodIndex2Ref) })
-productTrack2.addEventListener('touchend', () => { touchend(productTrack2, products2, prodWidth2, slideDots2,prodIndex2Ref) })
+window.addEventListener('load', () => {
+  let productsStyle = window.getComputedStyle(products[0])
+  let prodGap = parseInt(productsStyle.marginRight) || 0
+  let prodWidth = products[0].offsetWidth + prodGap
+  
+  productTrack.addEventListener('touchstart', (e) => { touchstart(e, productTrack) })
+  productTrack.addEventListener('touchmove', (e) => { touchmove(e, prodWidth, productTrack, prodIndexRef) })
+  productTrack.addEventListener('touchend', () => { touchend(productTrack, products, prodWidth, slideDots, prodIndexRef) })
+  
+  
+  let productsStyle2 = window.getComputedStyle(products2[0])
+  let prodGap2 = parseInt(productsStyle2.marginRight) || 0
+  let prodWidth2 = products2[0].offsetWidth + prodGap2
+  
+  productTrack2.addEventListener('touchstart', (e) => { touchstart(e, productTrack2) })
+  productTrack2.addEventListener('touchmove', (e) => { touchmove(e, prodWidth2, productTrack2, prodIndex2Ref) })
+  productTrack2.addEventListener('touchend', () => { touchend(productTrack2, products2, prodWidth2, slideDots2, prodIndex2Ref) })
+})
