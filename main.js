@@ -69,7 +69,6 @@ function touchend(track, contents, width, dots = [],indexRef) {
 
 function heroTouchend(track, contents, width,indexRef) {
   delta = endX - startX
-  console.log(indexRef)
   if (delta < -50 && indexRef.value < contents.length) {
     indexRef.value++
     if (indexRef.value == contents.length) indexRef.value = 0
