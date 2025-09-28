@@ -27,7 +27,7 @@ const hideCashes2 = document.querySelectorAll('.hide-cash2')
 const imgContainers2 = document.querySelectorAll('.img-container2')
 const heartIcons2 = document.querySelectorAll('.hearts2')
 const slideDots2 = document.querySelectorAll('.slider-dots2')
-
+const videoframe = document.querySelector('.videoframe')
 
 // ===============================
 // SLIDER HELPERS
@@ -172,6 +172,7 @@ let observer3 = new IntersectionObserver((entries) => {
 
 productsContainer.forEach(container => observer3.observe(container))
 
+observer3.observe(videoframe)
 let trackObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
     if (!entry.isIntersecting) {
