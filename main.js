@@ -296,7 +296,25 @@ window.addEventListener('load', () => {
   let prodGap2 = parseInt(productsStyle2.rowGap) || 0
   let prodPad2 = parseInt(productsStyle2.paddingLeft) || 0
   let prodWidth2 = products2[0].offsetWidth + prodGap2
+  productTrack2.addEventListener('touchstart', (e) => { touchstart(e, productTrack2) })
+  productTrack2.addEventListener('touchmove', (e) => { touchmove(e, prodWidth2, productTrack2, prodIndex2Ref) })
+  productTrack2.addEventListener('touchend', () => { touchend(productTrack2, products2, prodWidth2, slideDots2, prodIndex2Ref) })
+})
+
+window.addEventListener('resize', () => {
+  let productsStyle = window.getComputedStyle(productTrack)
+  let prodGap = parseInt(productsStyle.rowGap) || 0
+  let prodPad = parseInt(productsStyle.paddingLeft) || 0
+  let prodWidth = products[0].offsetWidth + prodGap
+  productTrack.addEventListener('touchstart', (e) => { touchstart(e, productTrack) })
+  productTrack.addEventListener('touchmove', (e) => { touchmove(e, prodWidth, productTrack, prodIndexRef) })
+  productTrack.addEventListener('touchend', () => { touchend(productTrack, products, prodWidth, slideDots, prodIndexRef) })
   
+  
+  let productsStyle2 = window.getComputedStyle(productTrack2)
+  let prodGap2 = parseInt(productsStyle2.rowGap) || 0
+  let prodPad2 = parseInt(productsStyle2.paddingLeft) || 0
+  let prodWidth2 = products2[0].offsetWidth + prodGap2
   productTrack2.addEventListener('touchstart', (e) => { touchstart(e, productTrack2) })
   productTrack2.addEventListener('touchmove', (e) => { touchmove(e, prodWidth2, productTrack2, prodIndex2Ref) })
   productTrack2.addEventListener('touchend', () => { touchend(productTrack2, products2, prodWidth2, slideDots2, prodIndex2Ref) })
