@@ -295,7 +295,6 @@ window.addEventListener('load', () => {
   let productsStyle2 = window.getComputedStyle(productTrack2)
   let prodGap2 = parseInt(productsStyle2.rowGap) || 0
   let prodPad2 = parseInt(productsStyle2.paddingLeft) || 0
-  console.log(prodPad2)
   let prodWidth2 = products2[0].offsetWidth + prodGap2
   
   productTrack2.addEventListener('touchstart', (e) => { touchstart(e, productTrack2) })
