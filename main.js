@@ -283,16 +283,19 @@ document.addEventListener('click', () => {
 // PRODUCT SLIDER TOUCH
 // ===============================
 window.addEventListener('load', () => {
-  let productsStyle = window.getComputedStyle(products[0])
-  let prodGap = parseInt(productsStyle.marginRight) || 0
+    let productsStyle = window.getComputedStyle(productTrack)
+  let prodGap = parseInt(productsStyle.rowGap) || 0
+  let prodPad = parseInt(productsStyle.paddingLeft) || 0
   let prodWidth = products[0].offsetWidth + prodGap
   productTrack.addEventListener('touchstart', (e) => { touchstart(e, productTrack) })
   productTrack.addEventListener('touchmove', (e) => { touchmove(e, prodWidth, productTrack, prodIndexRef) })
   productTrack.addEventListener('touchend', () => { touchend(productTrack, products, prodWidth, slideDots, prodIndexRef) })
   
   
-  let productsStyle2 = window.getComputedStyle(products2[0])
-  let prodGap2 = parseInt(productsStyle2.marginRight) || 0
+  let productsStyle2 = window.getComputedStyle(productTrack2)
+  let prodGap2 = parseInt(productsStyle2.rowGap) || 0
+  let prodPad2 = parseInt(productsStyle2.paddingLeft) || 0
+  console.log(prodPad2)
   let prodWidth2 = products2[0].offsetWidth + prodGap2
   
   productTrack2.addEventListener('touchstart', (e) => { touchstart(e, productTrack2) })
