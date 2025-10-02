@@ -57,7 +57,7 @@
         <span class="block bg-gray-600 w-6 h-[2px] rounded relative before:content-[''] before:w-6 before:h-[2px] before:bg-gray-600 before:top-2 before:block before:absolute before:rounded after:rounded after:content-[''] after:w-6 after:h-[2px] after:bg-gray-600 after:bottom-2 after:block after:absolute"></span>
       </button>
       <div class="flex gap-4 justify-between text-xl">
-        <i class="fa-regular fa-heart" id="love-icon"></i>
+        <i class="fa-regular fa-heart" id="heart-icon"></i>
         <i class="fa-regular fa-cart-shopping" id="shop-icon"></i>
         <i class="fa-solid fa-magnifying-glass" id="search-icon"></i>
       </div>
@@ -155,7 +155,7 @@
       <a href="" class="border-b-gray-400 w-fit border-b-[1.5px] ml-3">VIEW ALL PRODUCTS</a>
       <div class="overflow-hidden products-container scale-0 opacity-0 transition-all duration-1000 w-full">
         <div class="flex products-track transition-all duration-1000 pl-3 gap-4">
-          <div class="flex flex-shrink-0 w-[46%] flex-col gap-1 products ">
+          <div class="flex flex-shrink-0 w-[46%] flex-col gap-1 products" data-id="0">
             <div class="relative w-full img-container transition-all duration-500 mb-2">
               <img class=" transition-all duration-1000" src="Images/product-item-1.jpg" alt="" />
               <i class="hearts fa-regular fa-heart text-xl absolute top-1 right-1 bg-white w-10 h-12 flex items-center justify-center transition-all duration-500 hidden" id="love-icon"></i>
@@ -166,7 +166,7 @@
               <a class="translate-y-[5px] add-cart block transition-all duration-500">ADD TO CART</a>
             </div>
           </div>
-          <div class="flex flex-col flex-shrink-0 w-[46%] gap-1 products">
+          <div class="flex flex-col flex-shrink-0 w-[46%] gap-1 products" data-id="1">
             <div class="relative w-full img-container transition-all duration-500 mb-2">
               <img class=" transition-all duration-500" src="Images/product-item-2.jpg" alt="" />
               <i class="hearts fa-regular fa-heart text-xl absolute top-1 right-1 bg-white w-10 h-12 flex items-center justify-center transition-all duration-500 hidden" id="love-icon"></i>
@@ -177,7 +177,7 @@
               <a class="add-cart transition-all duration-500 translate-y-[5px]  block">ADD TO CART</a>
             </div>
           </div>
-          <div class="flex flex-col flex-shrink-0 w-[46%]  gap-1 products">
+          <div class="flex flex-col flex-shrink-0 w-[46%]  gap-1 products" data-id="2">
             <div class="relative w-full img-container transition-all duration-500 mb-2">
               <img class=" transition-all duration-500" src="Images/product-item-3.jpg" alt="" />
               <i class="hearts fa-regular fa-heart text-xl absolute top-1 right-1 bg-white w-10 h-12 flex items-center justify-center transition-all duration-500 hidden" id="love-icon"></i>
@@ -188,7 +188,7 @@
               <a class="block add-cart transition-all duration-500 translate-y-[5px]">ADD TO CART</a>
             </div>
           </div>
-          <div class="flex flex-col flex-shrink-0 w-[46%]  gap-1 products">
+          <div class="flex flex-col flex-shrink-0 w-[46%]  gap-1 products" data-id="3">
             <div class="relative w-full img-container transition-all duration-500 mb-2">
               <img class="transition-all duration-1000" src="Images/product-item-4.jpg" alt="" />
               <i class="hearts fa-regular fa-heart text-xl absolute top-1 right-1 bg-white w-10 h-12 flex items-center justify-center transition-all duration-500 hidden" id="love-icon"></i>
@@ -199,7 +199,7 @@
               <a class="block add-cart  transition-all duration-500 translate-y-[5px]">ADD TO CART</a>
             </div>
           </div>
-          <div class="flex flex-col flex-shrink-0 w-[46%] gap-1 products">
+          <div class="flex flex-col flex-shrink-0 w-[46%] gap-1 products" data-id="4">
             <div class="relative w-full img-container transition-all duration-500 mb-2">
               <img class=" transition-all duration-500" src="Images/product-item-10.jpg" alt="" />
               <i class="hearts fa-regular fa-heart text-xl absolute top-1 right-1 bg-white w-10 h-12 flex items-center justify-center transition-all duration-500 hidden" id="love-icon"></i>
@@ -236,7 +236,7 @@
       <a href="" class="border-b-gray-400 w-fit border-b-[1.5px] ml-3 ">VIEW ALL PRODUCTS</a>
       <div class="overflow-hidden products-container scale-0 opacity-0 transition-all duration-1000">
         <div class="flex products-track2 transition-all duration-1000 gap-4 pl-3">
-          <div class="flex flex-col flex-none w-[46%] gap-1 products2">
+          <div class="flex flex-col flex-none w-[46%] gap-1 products2" data-id="5">
             <div class="relative w-full img-container2 transition-all duration-500 mb-2">
               <img class=" transition-all duration-1000" src="Images/product-item-4.jpg" alt="" />
               <i class="hearts2 fa-regular fa-heart text-xl absolute top-1 right-1 bg-white w-10 h-12 flex items-center justify-center transition-all duration-500 hidden" id="love-icon"></i>
@@ -247,7 +247,7 @@
               <a class="translate-y-[5px] add-cart2 block transition-all duration-500">ADD TO CART</a>
             </div>
           </div>
-          <div class="flex flex-col flex-none w-[46%] gap-1 products2">
+          <div class="flex flex-col flex-none w-[46%] gap-1 products2" data-id="6">
             <div class="relative w-full img-container2 transition-all duration-500 mb-2">
               <img class="transition-all duration-500" src="Images/product-item-3.jpg" alt="" />
               <i class="hearts2 fa-regular fa-heart text-xl absolute top-1 right-1 bg-white w-10 h-12 flex items-center justify-center transition-all duration-500 hidden" id="love-icon"></i>
@@ -258,7 +258,7 @@
               <a class="add-cart2 transition-all duration-500 translate-y-[5px]  block">ADD TO CART</a>
             </div>
           </div>
-          <div class="flex flex-col flex-none w-[46%] gap-1  products2">
+          <div class="flex flex-col flex-none w-[46%] gap-1  products2" data-id="7">
             <div class="relative w-full img-container2 transition-all duration-500 mb-2">
               <img class="transition-all duration-500" src="Images/product-item-5.jpg" alt="" />
               <i class="hearts2 fa-regular fa-heart text-xl absolute top-1 right-1 bg-white w-10 h-12 flex items-center justify-center transition-all duration-500 hidden" id="love-icon"></i>
@@ -269,7 +269,7 @@
               <a class="block add-cart2 transition-all duration-500 translate-y-[5px]">ADD TO CART</a>
             </div>
           </div>
-          <div class="flex flex-col flex-none w-[46%] gap-1  products2">
+          <div class="flex flex-col flex-none w-[46%] gap-1  products2" data-id="8">
             <div class="relative w-full img-container2 transition-all duration-500 mb-2">
               <img class="transition-all duration-1000" src="Images/product-item-6.jpg" alt="" />
               <i class="hearts2 fa-regular fa-heart text-xl absolute top-1 right-1 bg-white w-10 h-12 flex items-center justify-center transition-all duration-500 hidden" id="love-icon"></i>
@@ -280,7 +280,7 @@
               <a class="block add-cart2  transition-all duration-500 translate-y-[5px]">ADD TO CART</a>
             </div>
           </div>
-          <div class="flex flex-col flex-none w-[46%] gap-1  products2">
+          <div class="flex flex-col flex-none w-[46%] gap-1  products2" data-id="9">
             <div class="relative w-full img-container2 transition-all duration-500 mb-2">
               <img class=" transition-all duration-500" src="Images/product-item-9.jpg" alt="" />
               <i class="hearts2 fa-regular fa-heart text-xl absolute top-1 right-1 bg-white w-10 h-12 flex items-center justify-center transition-all duration-500 hidden" id="love-icon"></i>
@@ -291,7 +291,7 @@
               <a class="block add-cart2 transition-all duration-500 translate-y-[5px]">ADD TO CART</a>
             </div>
           </div>
-          <div class="flex flex-col flex-none w-[46%] gap-1  products2">
+          <div class="flex flex-col flex-none w-[46%] gap-1  products2" data-id="10">
             <div class="relative w-full img-container2 transition-all duration-500 mb-2">
               <img class="transition-all duration-500" src="Images/product-item-10.jpg" alt="" />
               <i class="hearts2 fa-regular fa-heart text-xl absolute top-1 right-1 bg-white w-10 h-12 flex items-center justify-center transition-all duration-500 hidden" id="love-icon"></i>
@@ -382,7 +382,7 @@
       <a href="" class="border-b-gray-400 w-fit border-b-[1.5px] ml-3">VIEW ALL PRODUCTS</a>
       <div class="overflow-hidden products-container scale-0 opacity-0 transition-all duration-1000 w-full">
         <div class="flex products-track3 transition-all duration-1000 pl-3 gap-4">
-          <div class="flex flex-shrink-0 w-[46%] flex-col gap-1 products3 ">
+          <div class="flex flex-shrink-0 w-[46%] flex-col gap-1 products3 " data-id="11">
             <div class="relative w-full img-container3 transition-all duration-500 mb-2">
               <img class=" transition-all duration-1000" src="Images/product-item-5.jpg" alt="" />
               <i class="hearts3 fa-regular fa-heart text-xl absolute top-1 right-1 bg-white w-10 h-12 flex items-center justify-center transition-all duration-500 hidden" id="love-icon"></i>
@@ -393,7 +393,7 @@
               <a class="translate-y-[5px] add-cart3 block transition-all duration-500">ADD TO CART</a>
             </div>
           </div>
-          <div class="flex flex-col flex-shrink-0 w-[46%] gap-1 products3">
+          <div class="flex flex-col flex-shrink-0 w-[46%] gap-1 products3" data-id="12">
             <div class="relative w-full img-container3 transition-all duration-500 mb-2">
               <img class=" transition-all duration-500" src="Images/product-item-6.jpg" alt="" />
               <i class="hearts3 fa-regular fa-heart text-xl absolute top-1 right-1 bg-white w-10 h-12 flex items-center justify-center transition-all duration-500 hidden" id="love-icon"></i>
@@ -404,7 +404,7 @@
               <a class="add-cart3 transition-all duration-500 translate-y-[5px]  block">ADD TO CART</a>
             </div>
           </div>
-          <div class="flex flex-col flex-shrink-0 w-[46%]  gap-1 products3">
+          <div class="flex flex-col flex-shrink-0 w-[46%]  gap-1 products3" data-id="13">
             <div class="relative w-full img-container3 transition-all duration-500 mb-2">
               <img class=" transition-all duration-500" src="Images/product-item-7.jpg" alt="" />
               <i class="hearts3 fa-regular fa-heart text-xl absolute top-1 right-1 bg-white w-10 h-12 flex items-center justify-center transition-all duration-500 hidden" id="love-icon"></i>
@@ -415,7 +415,7 @@
               <a class="block add-cart3 transition-all duration-500 translate-y-[5px]">ADD TO CART</a>
             </div>
           </div>
-          <div class="flex flex-col flex-shrink-0 w-[46%]  gap-1 products3">
+          <div class="flex flex-col flex-shrink-0 w-[46%]  gap-1 products3" data-id="14">
             <div class="relative w-full img-container3 transition-all duration-500 mb-2">
               <img class="transition-all duration-1000" src="Images/product-item-8.jpg" alt="" />
               <i class="hearts3 fa-regular fa-heart text-xl absolute top-1 right-1 bg-white w-10 h-12 flex items-center justify-center transition-all duration-500 hidden" id="love-icon"></i>
@@ -426,7 +426,7 @@
               <a class="block add-cart3  transition-all duration-500 translate-y-[5px]">ADD TO CART</a>
             </div>
           </div>
-          <div class="flex flex-col flex-shrink-0 w-[46%] gap-1 products3">
+          <div class="flex flex-col flex-shrink-0 w-[46%] gap-1 products3" data-id="15">
             <div class="relative w-full img-container3 transition-all duration-500 mb-2">
               <img class=" transition-all duration-500" src="Images/product-item-1.jpg" alt="" />
               <i class="hearts3 fa-regular fa-heart text-xl absolute top-1 right-1 bg-white w-10 h-12 flex items-center justify-center transition-all duration-500 hidden" id="love-icon"></i>
