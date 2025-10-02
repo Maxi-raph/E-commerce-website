@@ -1,4 +1,5 @@
 let favoritesArr = JSON.parse(localStorage.getItem('favorites')) || []
+let cartsArr = JSON.parse(localStorage.getItem('carts')) || []
 
 // ===============================
 // HELPERS
@@ -18,6 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // DOM ELEMENTS
   // -------------------------------
   const favoritesIcon = document.getElementById('heart-icon')
+  const cartIcon = document.getElementById('cart-icon')
   const heading = document.querySelector('#home-text h2')
   const paragraph = document.querySelector('#home-text p')
   const heroContain = document.querySelector('.slide-contain')
@@ -30,27 +32,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const productsContainer = document.querySelectorAll('.products-container')
   
   const productTrack = document.querySelector('.products-track')
-  const products = document.querySelectorAll('.products')
-  const addCarts = document.querySelectorAll('.add-cart')
-  const hideCashes = document.querySelectorAll('.hide-cash')
-  const imgContainers = document.querySelectorAll('.img-container')
-  const heartIcons = document.querySelectorAll('.hearts')
+  const products = document.querySelectorAll('.products1')
   const slideDots = document.querySelectorAll('.slider-dots')
   
   const productTrack2 = document.querySelector('.products-track2')
   const products2 = document.querySelectorAll('.products2')
-  const addCarts2 = document.querySelectorAll('.add-cart2')
-  const hideCashes2 = document.querySelectorAll('.hide-cash2')
-  const imgContainers2 = document.querySelectorAll('.img-container2')
-  const heartIcons2 = document.querySelectorAll('.hearts2')
   const slideDots2 = document.querySelectorAll('.slider-dots2')
   
   const productTrack3 = document.querySelector('.products-track3')
   const products3 = document.querySelectorAll('.products3')
-  const addCarts3 = document.querySelectorAll('.add-cart3')
-  const hideCashes3 = document.querySelectorAll('.hide-cash3')
-  const imgContainers3 = document.querySelectorAll('.img-container3')
-  const heartIcons3 = document.querySelectorAll('.hearts3')
   const slideDots4 = document.querySelectorAll('.slider-dots4')
   
   const videoframe = document.querySelector('.videoframe')
@@ -65,6 +55,10 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!favoritesIcon) return
   favoritesIcon.addEventListener('click', () => {
     window.location.href = 'favorites.html'
+  })
+  
+  cartIcon.addEventListener('click', () => {
+    window.location.href = 'cart.html'
   })
   
   // -------------------------------
@@ -246,143 +240,67 @@ document.addEventListener("DOMContentLoaded", () => {
   // -------------------------------
   // PRODUCT CLICK HANDLERS (1, 2, 3)
   // -------------------------------
-  products.forEach(product => {
-    product.addEventListener('click', (e) => {
-      e.stopPropagation()
-      let addCart = product.querySelector('.add-cart')
-      let hideCash = product.querySelector('.hide-cash')
-      let imgContainer = product.querySelector('.img-container')
-      let heartIcon = product.querySelector('.hearts')
-      
-      if (hideCash.classList.contains('translate-y-[-20px]')) {
-        if (e.target.classList.contains('hearts')) {
-          e.target.classList.toggle('text-red-500')
-          e.target.classList.remove('hidden')
-          //I'll add the favorites in an array here so that once i click the heart icon at the top, i'll go to a site where all the favourites are in a row
-          const productData = {
-            id: product.dataset.id,
-            name: product.querySelector('h4').textContent,
-            price: product.querySelector('.hide-cash').textContent,
-            image: product.querySelector('img').src
+  for (let i = 1; i < 4; i++) {
+    document.querySelectorAll(`.products${i}`).forEach(product => {
+      product.addEventListener('click', (e) => {
+        e.stopPropagation()
+        let addCart = product.querySelector(`.add-cart${i}`)
+        let hideCash = product.querySelector(`.hide-cash${i}`)
+        let imgContainer = product.querySelector(`.img-container${i}`)
+        let heartIcon = product.querySelector(`.hearts${i}`)
+        
+        if (hideCash.classList.contains('translate-y-[-20px]')) {
+          if (e.target.classList.contains(`hearts${i}`)) {
+            e.target.classList.toggle('text-red-500')
+            e.target.classList.remove('hidden')
+            //I'll add the favorites in an array here so that once i click the heart icon at the top, i'll go to a site where all the favourites are in a row
+            const productData = {
+              id: product.dataset.id,
+              name: product.querySelector('h4').textContent,
+              price: product.querySelector(`.hide-cash${i}`).textContent,
+              image: product.querySelector('img').src
+            }
+            if (!favoritesArr.some(item => item.id === productData.id)) {
+              favoritesArr.push(productData)
+            }
+            if (!e.target.classList.contains('text-red-500')) {
+              favoritesArr = favoritesArr.filter(item => item.id !== product.dataset.id)
+            }
+            localStorage.setItem('favorites', JSON.stringify(favoritesArr))
+            return
           }
-          if (!favoritesArr.some(item => item.id === productData.id)) {
-            favoritesArr.push(productData)
-          }
-          if (!e.target.classList.contains('text-red-500')) {
-            favoritesArr = favoritesArr.filter(item => item.id !== product.dataset.id)
-          }
-          localStorage.setItem('favorites', JSON.stringify(favoritesArr))
-          return
+          window.location.href = ''
+        } else {
+          const addCarts = document.querySelectorAll(`.add-cart${i}`)
+          const hideCashes = document.querySelectorAll(`.hide-cash${i}`)
+          const imgContainers = document.querySelectorAll(`.img-container${i}`)
+          const heartIcons = document.querySelectorAll(`.hearts${i}`)
+          clickedProduct(e, addCarts, hideCashes, imgContainers, heartIcons)
+          hideCash.classList.add('translate-y-[-20px]')
+          addCart.classList.add('translate-y-[-23px]')
+          imgContainer.classList.add('scale-[0.9]')
+          heartIcon.classList.remove('hidden')
         }
-        window.location.href = ''
-      } else {
-        clickedProduct(e, addCarts, hideCashes, imgContainers, heartIcons)
-        hideCash.classList.add('translate-y-[-20px]')
-        addCart.classList.add('translate-y-[-23px]')
-        imgContainer.classList.add('scale-[0.9]')
-        heartIcon.classList.remove('hidden')
-      }
+      })
     })
-  })
-  
-  products2.forEach(product => {
-    product.addEventListener('click', (e) => {
-      e.stopPropagation()
-      let addCart = product.querySelector('.add-cart2')
-      let hideCash = product.querySelector('.hide-cash2')
-      let imgContainer = product.querySelector('.img-container2')
-      let heartIcon = product.querySelector('.hearts2')
-      
-      if (hideCash.classList.contains('translate-y-[-20px]')) {
-        if (e.target.classList.contains('hearts2')) {
-          e.target.classList.toggle('text-red-500')
-          e.target.classList.remove('hidden')
-          //I'll add the favorites in an array here so that once i click the heart icon at the top, i'll go to a site where all the favourites are in a row
-          const productData = {
-            id: product.dataset.id,
-            name: product.querySelector('h4').textContent,
-            price: product.querySelector('.hide-cash2').textContent,
-            image: product.querySelector('img').src
-          }
-          if (!favoritesArr.some(item => item.id === productData.id)) {
-            favoritesArr.push(productData)
-          }
-          if (!e.target.classList.contains('text-red-500')) {
-            favoritesArr = favoritesArr.filter(item => item.id !== product.dataset.id)
-          }
-          localStorage.setItem('favorites', JSON.stringify(favoritesArr))
-          return
-        }
-        window.location.href = ''
-      } else {
-        clickedProduct(e, addCarts2, hideCashes2, imgContainers2, heartIcons2)
-        hideCash.classList.add('translate-y-[-20px]')
-        addCart.classList.add('translate-y-[-23px]')
-        imgContainer.classList.add('scale-[0.9]')
-        heartIcon.classList.remove('hidden')
-      }
-    })
-  })
-  
-  products3.forEach(product => {
-    product.addEventListener('click', (e) => {
-      e.stopPropagation()
-      let addCart = product.querySelector('.add-cart3')
-      let hideCash = product.querySelector('.hide-cash3')
-      let imgContainer = product.querySelector('.img-container3')
-      let heartIcon = product.querySelector('.hearts3')
-      
-      if (hideCash.classList.contains('translate-y-[-20px]')) {
-        if (e.target.classList.contains('hearts3')) {
-          e.target.classList.toggle('text-red-500')
-          e.target.classList.remove('hidden')
-          //I'll add the favorites in an array here so that once i click the heart icon at the top, i'll go to a site where all the favourites are in a row
-          const productData = {
-            id: product.dataset.id,
-            name: product.querySelector('h4').textContent,
-            price: product.querySelector('.hide-cash3').textContent,
-            image: product.querySelector('img').src
-          }
-          if (!favoritesArr.some(item => item.id === productData.id)) {
-            favoritesArr.push(productData)
-          }
-          if (!e.target.classList.contains('text-red-500')) {
-            favoritesArr = favoritesArr.filter(item => item.id !== product.dataset.id)
-          }
-          localStorage.setItem('favorites', JSON.stringify(favoritesArr))
-          return
-        }
-        window.location.href = ''
-      } else {
-        clickedProduct(e, addCarts3, hideCashes3, imgContainers3, heartIcons3)
-        hideCash.classList.add('translate-y-[-20px]')
-        addCart.classList.add('translate-y-[-23px]')
-        imgContainer.classList.add('scale-[0.9]')
-        heartIcon.classList.remove('hidden')
-      }
-    })
-  })
-  
+  }
   
   // -------------------------------
   // DOCUMENT CLICK RESET
   // -------------------------------
   document.addEventListener('click', () => {
-    console.log(favoritesArr)
+    for (let i = 1; i < 4; i++) {
+    const addCarts = document.querySelectorAll(`.add-cart${i}`)
+    const hideCashes = document.querySelectorAll(`.hide-cash${i}`)
+    const imgContainers = document.querySelectorAll(`.img-container${i}`)
+    
+    const heartIcons = document.querySelectorAll(`.hearts${i}`)
+    
     addCarts.forEach(cart => cart.classList.remove('translate-y-[-23px]'))
     hideCashes.forEach(cash => cash.classList.remove('translate-y-[-20px]'))
     imgContainers.forEach(contain => contain.classList.remove('scale-[0.9]'))
     heartIcons.forEach(heart => heart.classList.add('hidden'))
-    
-    addCarts2.forEach(cart => cart.classList.remove('translate-y-[-23px]'))
-    hideCashes2.forEach(cash => cash.classList.remove('translate-y-[-20px]'))
-    imgContainers2.forEach(contain => contain.classList.remove('scale-[0.9]'))
-    heartIcons2.forEach(heart => heart.classList.add('hidden'))
-    
-    addCarts3.forEach(cart => cart.classList.remove('translate-y-[-23px]'))
-    hideCashes3.forEach(cash => cash.classList.remove('translate-y-[-20px]'))
-    imgContainers3.forEach(contain => contain.classList.remove('scale-[0.9]'))
-    heartIcons3.forEach(heart => heart.classList.add('hidden'))
+    }
   })
   
   // -------------------------------
@@ -493,7 +411,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 favoritesContainer.removeChild(removedFav)
               }
             })
+            stored = stored.filter(item => item.id !== product.dataset.id)
             favoritesArr = favoritesArr.filter(item => item.id !== product.dataset.id)
+            console.log(favoritesArr,stored)
             localStorage.setItem('favorites', JSON.stringify(favoritesArr))
           }
           return
