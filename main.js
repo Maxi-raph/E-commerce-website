@@ -31,9 +31,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const shops = document.querySelectorAll('.shops')
   const productsContainer = document.querySelectorAll('.products-container')
   
-  const productTrack = document.querySelector('.products-track')
-  const products = document.querySelectorAll('.products1')
-  const slideDots = document.querySelectorAll('.slider-dots')
+  const productTrack = document.querySelector('.products-track1')
+  const products1 = document.querySelectorAll('.products1')
+  const slideDots = document.querySelectorAll('.slider-dots1')
   
   const productTrack2 = document.querySelector('.products-track2')
   const products2 = document.querySelectorAll('.products2')
@@ -41,13 +41,13 @@ document.addEventListener("DOMContentLoaded", () => {
   
   const productTrack3 = document.querySelector('.products-track3')
   const products3 = document.querySelectorAll('.products3')
-  const slideDots4 = document.querySelectorAll('.slider-dots4')
+  const slideDots3 = document.querySelectorAll('.slider-dots3')
   
   const videoframe = document.querySelector('.videoframe')
   const testimonialsContain = document.querySelector('.testimonials-container')
   const testimonialsTrack = document.querySelector('.testimonials-track')
   const testimonials = document.querySelectorAll('.testimonials')
-  const slideDots3 = document.querySelectorAll('.slider-dots3')
+  const slideDots4 = document.querySelectorAll('.slider-dots4')
   
   // -------------------------------
   // FAVORITES ICON
@@ -86,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
   function touchend(track, contents, width, dots = [], indexRef, visibleCount) {
     delta = endX - startX
-    if (event.target.classList.contains('hearts') || event.target.classList.contains('hearts2')) return
+    if (event.target.classList.contains('hearts1') || event.target.classList.contains('hearts2') || event.target.classList.contains('hearts3')) return
     if (delta < -50 && indexRef.value < contents.length - visibleCount) {
       indexRef.value++
     } else if (delta > 50 && indexRef.value > 0) {
@@ -204,30 +204,23 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!entry.isIntersecting) {
         heroIndexRef.value = 0
         prodIndexRef.value = 0
-        prodIndex2Ref.value = 0
-        prodIndex3Ref.value = 0
         testIndexRef.value = 0
         
         heroTrack.style.transition = 'transform 0.6s ease'
         heroTrack.style.transform = `translateX(0px)`
         
-        productTrack.style.transition = 'transform 0.6s ease'
-        productTrack.style.transform = `translateX(0px)`
-        slideDots.forEach(dot => dot.classList.remove('bg-stone-400'))
-        slideDots[0].classList.add('bg-stone-400')
-        
-        productTrack2.style.transition = 'transform 0.6s ease'
-        productTrack2.style.transform = `translateX(0px)`
-        slideDots2.forEach(dot => dot.classList.remove('bg-stone-400'))
-        slideDots2[0].classList.add('bg-stone-400')
+        for (let i = 1; i < 4; i++) {
+          const productTrack = document.querySelector(`.products-track${i}`)
+          const slideDots = document.querySelectorAll(`.slider-dots${i}`)
+          
+          productTrack.style.transition = 'transform 0.6s ease'
+          productTrack.style.transform = `translateX(0px)`
+          slideDots.forEach(dot => dot.classList.remove('bg-stone-400'))
+          slideDots[0].classList.add('bg-stone-400')
+        }
         
         testimonialsTrack.style.transition = 'transform 0.6s ease'
         testimonialsTrack.style.transform = `translateX(0px)`
-        slideDots3.forEach(dot => dot.classList.remove('bg-stone-400'))
-        slideDots3[0].classList.add('bg-stone-400')
-        
-        productTrack3.style.transition = 'transform 0.6s ease'
-        productTrack3.style.transform = `translateX(0px)`
         slideDots4.forEach(dot => dot.classList.remove('bg-stone-400'))
         slideDots4[0].classList.add('bg-stone-400')
       }
@@ -253,7 +246,6 @@ document.addEventListener("DOMContentLoaded", () => {
           if (e.target.classList.contains(`hearts${i}`)) {
             e.target.classList.toggle('text-red-500')
             e.target.classList.remove('hidden')
-            //I'll add the favorites in an array here so that once i click the heart icon at the top, i'll go to a site where all the favourites are in a row
             const productData = {
               id: product.dataset.id,
               name: product.querySelector('h4').textContent,
@@ -290,16 +282,15 @@ document.addEventListener("DOMContentLoaded", () => {
   // -------------------------------
   document.addEventListener('click', () => {
     for (let i = 1; i < 4; i++) {
-    const addCarts = document.querySelectorAll(`.add-cart${i}`)
-    const hideCashes = document.querySelectorAll(`.hide-cash${i}`)
-    const imgContainers = document.querySelectorAll(`.img-container${i}`)
-    
-    const heartIcons = document.querySelectorAll(`.hearts${i}`)
-    
-    addCarts.forEach(cart => cart.classList.remove('translate-y-[-23px]'))
-    hideCashes.forEach(cash => cash.classList.remove('translate-y-[-20px]'))
-    imgContainers.forEach(contain => contain.classList.remove('scale-[0.9]'))
-    heartIcons.forEach(heart => heart.classList.add('hidden'))
+      const addCarts = document.querySelectorAll(`.add-cart${i}`)
+      const hideCashes = document.querySelectorAll(`.hide-cash${i}`)
+      const imgContainers = document.querySelectorAll(`.img-container${i}`)
+      const heartIcons = document.querySelectorAll(`.hearts${i}`)
+      
+      addCarts.forEach(cart => cart.classList.remove('translate-y-[-23px]'))
+      hideCashes.forEach(cash => cash.classList.remove('translate-y-[-20px]'))
+      imgContainers.forEach(contain => contain.classList.remove('scale-[0.9]'))
+      heartIcons.forEach(heart => heart.classList.add('hidden'))
     }
   })
   
@@ -310,36 +301,24 @@ document.addEventListener("DOMContentLoaded", () => {
     // ===============================
     // PRODUCT SLIDER TOUCH
     // ===============================
-    let productsStyle = window.getComputedStyle(productTrack)
-    let prodGap = parseInt(productsStyle.rowGap) || 0
-    let prodPad = parseInt(productsStyle.paddingLeft) || 0
-    let prodWidth = products[0].offsetWidth + prodGap
-    productTrack.addEventListener('touchstart', (e) => { touchstart(e, productTrack) })
-    productTrack.addEventListener('touchmove', (e) => { touchmove(e, prodWidth, productTrack, prodIndexRef) })
-    productTrack.addEventListener('touchend', () => { touchend(productTrack, products, prodWidth, slideDots, prodIndexRef, 2) })
-    
-    
-    let productsStyle2 = window.getComputedStyle(productTrack2)
-    let prodGap2 = parseInt(productsStyle2.rowGap) || 0
-    let prodPad2 = parseInt(productsStyle2.paddingLeft) || 0
-    let prodWidth2 = products2[0].offsetWidth + prodGap2
-    productTrack2.addEventListener('touchstart', (e) => { touchstart(e, productTrack2) })
-    productTrack2.addEventListener('touchmove', (e) => { touchmove(e, prodWidth2, productTrack2, prodIndex2Ref) })
-    productTrack2.addEventListener('touchend', () => { touchend(productTrack2, products2, prodWidth2, slideDots2, prodIndex2Ref, 2) })
-    
-    let productsStyle3 = window.getComputedStyle(productTrack3)
-    let prodGap3 = parseInt(productsStyle3.rowGap) || 0
-    let prodPad3 = parseInt(productsStyle3.paddingLeft) || 0
-    let prodWidth3 = products3[0].offsetWidth + prodGap3
-    productTrack3.addEventListener('touchstart', (e) => { touchstart(e, productTrack3) })
-    productTrack3.addEventListener('touchmove', (e) => { touchmove(e, prodWidth3, productTrack3, prodIndex3Ref) })
-    productTrack3.addEventListener('touchend', () => { touchend(productTrack3, products3, prodWidth3, slideDots4, prodIndex3Ref, 2) })
-    
+    for (let i = 1; i < 4; i++) {
+      const productTrack = document.querySelector(`.products-track${i}`)
+      const products = document.querySelectorAll(`.products${i}`)
+      const slideDots = document.querySelectorAll(`.slider-dots${i}`)
+      
+      let productsStyle = window.getComputedStyle(productTrack)
+      let prodGap = parseInt(productsStyle.rowGap) || 0
+      let prodPad = parseInt(productsStyle.paddingLeft) || 0
+      let prodWidth = products[0].offsetWidth + prodGap
+      
+      productTrack.addEventListener('touchstart', (e) => { touchstart(e, productTrack) })
+      productTrack.addEventListener('touchmove', (e) => { touchmove(e, prodWidth, productTrack, prodIndexRef) })
+      productTrack.addEventListener('touchend', () => { touchend(productTrack, products, prodWidth, slideDots, prodIndexRef, 2) })
+    }
     
     // ===============================
     // TESTIMONIALS SLIDER TOUCH
     // ===============================
-    
     let testStyles = window.getComputedStyle(testimonials[0])
     let testWidth = parseInt(testStyles.width)
     
@@ -352,7 +331,7 @@ document.addEventListener("DOMContentLoaded", () => {
     })
     
     testimonialsTrack.addEventListener('touchend', () => {
-      touchend(testimonialsTrack, testimonials, testWidth, slideDots3, testIndexRef, 1)
+      touchend(testimonialsTrack, testimonials, testWidth, slideDots4, testIndexRef, 1)
     })
   })
 })
@@ -362,6 +341,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // ===============================
 document.addEventListener('DOMContentLoaded', () => {
   const favoritesContainer = document.querySelector('.favorites-container')
+  const span = document.querySelector('span')
   if (!favoritesContainer) return
   
   let stored = JSON.parse(localStorage.getItem('favorites')) || []
@@ -391,6 +371,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const imgContainers = document.querySelectorAll('.img-container')
   const heartIcons = document.querySelectorAll('.hearts')
   
+  if (stored.length === 0) {
+  span.textContent = "No favorites yet!";
+   }
+   
   products.forEach(product => {
     product.addEventListener('click', (e) => {
       e.stopPropagation()
@@ -413,8 +397,11 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             stored = stored.filter(item => item.id !== product.dataset.id)
             favoritesArr = favoritesArr.filter(item => item.id !== product.dataset.id)
-            console.log(favoritesArr,stored)
+            console.log(favoritesArr, stored)
             localStorage.setItem('favorites', JSON.stringify(favoritesArr))
+            if (stored.length === 0) {
+             span.textContent = "No favorites yet!";
+            }
           }
           return
         }
