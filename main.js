@@ -10,7 +10,105 @@ function clickedProduct(e, addCarts, hideCashes, imgContainers, heartIcons) {
   imgContainers.forEach(contain => contain.classList.remove('scale-[0.9]'))
   heartIcons.forEach(heart => heart.classList.add('hidden'))
 }
-
+  function enableClick(storedArr = [],container,span) {
+    
+  // -------------------------------
+  // PRODUCT CLICK HANDLERS (1, 2, 3)
+  // -------------------------------
+  for (let i = 1; i < 4; i++) {
+    document.querySelectorAll(`.products${i}`).forEach(product => {
+      product.addEventListener('click', (e) => {
+        e.stopPropagation()
+        let addCart = product.querySelector(`.add-cart${i}`)
+        let hideCash = product.querySelector(`.hide-cash${i}`)
+        let imgContainer = product.querySelector(`.img-container${i}`)
+        let heartIcon = product.querySelector(`.hearts${i}`)
+        
+        if (hideCash.classList.contains('translate-y-[-20px]')) {
+          if (e.target == heartIcon) {
+            e.target.classList.toggle('text-red-500')
+            e.target.classList.remove('hidden')
+            const productData = {
+              id: product.dataset.id,
+              name: product.querySelector('h4').textContent,
+              price: product.querySelector(`.hide-cash${i}`).textContent,
+              image: product.querySelector('img').src
+            }
+            if (!favoritesArr.some(item => item.id === productData.id)) {
+              favoritesArr.push(productData)
+            }
+            if (!e.target.classList.contains('text-red-500')) {
+              favoritesArr = favoritesArr.filter(item => item.id !== product.dataset.id)
+            }
+            localStorage.setItem('favorites', JSON.stringify(favoritesArr))
+ if (storedArr.length > 0) {
+  storedArr.filter(item => {
+    if (item.id == product.dataset.id) {
+      let removedFav = container.querySelector(`[data-id="${item.id}"]`)
+      container.removeChild(removedFav)
+    }
+  })
+  storedArr = storedArr.filter(item => item.id !== product.dataset.id)
+  favoritesArr = favoritesArr.filter(item => item.id !== product.dataset.id)
+  localStorage.setItem('favorites', JSON.stringify(favoritesArr))
+  if (storedArr.length === 0) {
+    span.textContent = "No favorites yet!";
+  }
+}           
+            return
+          }
+          if (e.target == addCart || e.target !== heartIcon) {
+            const productData = {
+              id: product.dataset.id,
+              name: product.querySelector('h4').textContent,
+              price: product.querySelector(`.hide-cash${i}`).textContent,
+              image: product.querySelector('img').src,
+              quantity: 1
+            }
+            
+            let exists = cartsArr.find(item => item.id == product.dataset.id)
+            if (exists) {
+              exists.quantity++
+            }
+            if (!cartsArr.some(item => item.id == product.dataset.id)) {
+              cartsArr.push(productData)
+            }
+            localStorage.setItem('carts', JSON.stringify(cartsArr))
+          }
+          window.location.href = 'cart.html'
+        } else {
+          const addCarts = document.querySelectorAll(`.add-cart${i}`)
+          const hideCashes = document.querySelectorAll(`.hide-cash${i}`)
+          const imgContainers = document.querySelectorAll(`.img-container${i}`)
+          const heartIcons = document.querySelectorAll(`.hearts${i}`)
+          clickedProduct(e, addCarts, hideCashes, imgContainers, heartIcons)
+          hideCash.classList.add('translate-y-[-20px]')
+          addCart.classList.add('translate-y-[-23px]')
+          imgContainer.classList.add('scale-[0.9]')
+          heartIcon.classList.remove('hidden')
+        }
+      })
+    })
+  }
+  
+    // -------------------------------
+  // DOCUMENT CLICK RESET
+  // -------------------------------
+  document.addEventListener('click', () => {
+    for (let i = 1; i < 4; i++) {
+      const addCarts = document.querySelectorAll(`.add-cart${i}`)
+      const hideCashes = document.querySelectorAll(`.hide-cash${i}`)
+      const imgContainers = document.querySelectorAll(`.img-container${i}`)
+      const heartIcons = document.querySelectorAll(`.hearts${i}`)
+      
+      addCarts.forEach(cart => cart.classList.remove('translate-y-[-23px]'))
+      hideCashes.forEach(cash => cash.classList.remove('translate-y-[-20px]'))
+      imgContainers.forEach(contain => contain.classList.remove('scale-[0.9]'))
+      heartIcons.forEach(heart => heart.classList.add('hidden'))
+    }
+  })
+  }
+  
 // ===============================
 // MAIN PAGE LOGIC
 // ===============================
@@ -60,14 +158,12 @@ document.addEventListener("DOMContentLoaded", () => {
   cartIcon.addEventListener('click', () => {
     window.location.href = 'cart.html'
   })
-  
+  enableClick()
   // -------------------------------
   // SLIDER HELPERS
   // -------------------------------
   let heroIndexRef = { value: 0 }
   let prodIndexRef = { value: 0 }
-  let prodIndex2Ref = { value: 0 }
-  let prodIndex3Ref = { value: 0 }
   let testIndexRef = { value: 0 }
   let startX = 0
   let endX = 0
@@ -84,7 +180,7 @@ document.addEventListener("DOMContentLoaded", () => {
     track.style.transform = `translateX(${offset}px)`
   }
   
-  function touchend(track, contents, width, dots = [], indexRef, visibleCount) {
+  function touchend(track, contents, width, dots = [], indexRef, visibleCount,event) {
     delta = endX - startX
     if (event.target.classList.contains('hearts1') || event.target.classList.contains('hearts2') || event.target.classList.contains('hearts3')) return
     if (delta < -50 && indexRef.value < contents.length - visibleCount) {
@@ -229,71 +325,6 @@ document.addEventListener("DOMContentLoaded", () => {
   productsContainer.forEach(container => { trackObserver.observe(container) })
   trackObserver.observe(heroContain)
   trackObserver.observe(testimonialsContain)
-  
-  // -------------------------------
-  // PRODUCT CLICK HANDLERS (1, 2, 3)
-  // -------------------------------
-  for (let i = 1; i < 4; i++) {
-    document.querySelectorAll(`.products${i}`).forEach(product => {
-      product.addEventListener('click', (e) => {
-        e.stopPropagation()
-        let addCart = product.querySelector(`.add-cart${i}`)
-        let hideCash = product.querySelector(`.hide-cash${i}`)
-        let imgContainer = product.querySelector(`.img-container${i}`)
-        let heartIcon = product.querySelector(`.hearts${i}`)
-        
-        if (hideCash.classList.contains('translate-y-[-20px]')) {
-          if (e.target.classList.contains(`hearts${i}`)) {
-            e.target.classList.toggle('text-red-500')
-            e.target.classList.remove('hidden')
-            const productData = {
-              id: product.dataset.id,
-              name: product.querySelector('h4').textContent,
-              price: product.querySelector(`.hide-cash${i}`).textContent,
-              image: product.querySelector('img').src
-            }
-            if (!favoritesArr.some(item => item.id === productData.id)) {
-              favoritesArr.push(productData)
-            }
-            if (!e.target.classList.contains('text-red-500')) {
-              favoritesArr = favoritesArr.filter(item => item.id !== product.dataset.id)
-            }
-            localStorage.setItem('favorites', JSON.stringify(favoritesArr))
-            return
-          }
-          window.location.href = ''
-        } else {
-          const addCarts = document.querySelectorAll(`.add-cart${i}`)
-          const hideCashes = document.querySelectorAll(`.hide-cash${i}`)
-          const imgContainers = document.querySelectorAll(`.img-container${i}`)
-          const heartIcons = document.querySelectorAll(`.hearts${i}`)
-          clickedProduct(e, addCarts, hideCashes, imgContainers, heartIcons)
-          hideCash.classList.add('translate-y-[-20px]')
-          addCart.classList.add('translate-y-[-23px]')
-          imgContainer.classList.add('scale-[0.9]')
-          heartIcon.classList.remove('hidden')
-        }
-      })
-    })
-  }
-  
-  // -------------------------------
-  // DOCUMENT CLICK RESET
-  // -------------------------------
-  document.addEventListener('click', () => {
-    for (let i = 1; i < 4; i++) {
-      const addCarts = document.querySelectorAll(`.add-cart${i}`)
-      const hideCashes = document.querySelectorAll(`.hide-cash${i}`)
-      const imgContainers = document.querySelectorAll(`.img-container${i}`)
-      const heartIcons = document.querySelectorAll(`.hearts${i}`)
-      
-      addCarts.forEach(cart => cart.classList.remove('translate-y-[-23px]'))
-      hideCashes.forEach(cash => cash.classList.remove('translate-y-[-20px]'))
-      imgContainers.forEach(contain => contain.classList.remove('scale-[0.9]'))
-      heartIcons.forEach(heart => heart.classList.add('hidden'))
-    }
-  })
-  
   // -------------------------------
   // WINDOW LOAD → SLIDER TOUCH SETUP
   // -------------------------------
@@ -313,7 +344,7 @@ document.addEventListener("DOMContentLoaded", () => {
       
       productTrack.addEventListener('touchstart', (e) => { touchstart(e, productTrack) })
       productTrack.addEventListener('touchmove', (e) => { touchmove(e, prodWidth, productTrack, prodIndexRef) })
-      productTrack.addEventListener('touchend', () => { touchend(productTrack, products, prodWidth, slideDots, prodIndexRef, 2) })
+      productTrack.addEventListener('touchend', (e) => { touchend(productTrack, products, prodWidth, slideDots, prodIndexRef, 2,e) })
     }
     
     // ===============================
@@ -343,76 +374,146 @@ document.addEventListener('DOMContentLoaded', () => {
   const favoritesContainer = document.querySelector('.favorites-container')
   const span = document.querySelector('span')
   if (!favoritesContainer) return
-  
-  let stored = JSON.parse(localStorage.getItem('favorites')) || []
-  
+  let storedFav = JSON.parse(localStorage.getItem('favorites')) || []
   // render favorites
-  stored.forEach(product => {
+  storedFav.forEach(product => {
     let node = document.createElement('div')
-    node.classList.add('flex', 'flex-shrink-0', 'w-[48%]', 'flex-col', 'gap-1', 'products', 'shadow', 'p-1', 'bg-stone-400')
+    node.classList.add('flex', 'flex-shrink-0', 'w-[48%]', 'flex-col', 'gap-1', 'products1', 'shadow', 'p-1', 'bg-stone-400')
     node.dataset.id = product.id
     node.innerHTML = `
-      <div class="relative w-full img-container transition-all duration-500 mb-2">
+      <div class="relative w-full img-container1 transition-all duration-500 mb-2">
         <img class="transition-all duration-1000" src="${product.image}" alt="" />
-        <i class="hearts fa-regular fa-heart text-xl text-red-500 absolute top-1 right-1 bg-white w-10 h-12 flex items-center justify-center transition-all duration-500 hidden"></i>
+        <i class="hearts1 fa-regular fa-heart text-xl text-red-500 absolute top-1 right-1 bg-white w-10 h-12 flex items-center justify-center transition-all duration-500 hidden"></i>
       </div>
       <h4 class="text-xl w-full font-marcel text-white">${product.name}</h4>
       <div class="overflow-y-hidden h-6">
-        <span class="hide-cash transition-all block duration-500 translate-y-0 text-white">${product.price}</span>
-        <a class="translate-y-[5px] add-cart block transition-all duration-500 text-white">ADD TO CART</a>
+        <span class="hide-cash1 transition-all block duration-500 translate-y-0 text-white">${product.price}</span>
+        <a class="translate-y-[5px] add-cart1 block transition-all duration-500 text-white">ADD TO CART</a>
       </div>`
     favoritesContainer.appendChild(node)
   })
+  enableClick(storedFav,favoritesContainer,span)
+  if (storedFav.length === 0) {
+    span.textContent = "No favorites yet!";
+  }
+})
+
+// ===============================
+// CART HTML LOGIC
+// ===============================
+document.addEventListener('DOMContentLoaded', () => {
+  const cartContainer = document.querySelector('.cart-container')
+  const total = document.querySelector('.total')
+  const footText = document.querySelector('.estimate')
+  const span = document.querySelector('.span')
+  if (!cartContainer) return
+  let storedCart = JSON.parse(localStorage.getItem('carts')) || []
+  storedCart.forEach(product => {
+    let node = document.createElement('div')
+    node.classList.add('flex', 'flex-shrink-0', 'w-full', 'gap-4', 'products', 'shadow', 'p-1', 'bg-stone-400', 'min-h-40')
+    node.dataset.id = product.id
+    node.innerHTML = `
+      <div class="relative w-24 h-32 flex-none img-container transition-all duration-500 shadow">
+      <img class="transition-all duration-1000 w-full h-full" src="${product.image}" alt="" />
+    </div>
+    <div class="flex flex-col justify-between pb-1">
+      <h4 class="text-[18px] w-full font-marcel text-white">${product.name}</h4>
+      <span class="hide-cash transition-all block duration-500 text-white font-marcel price">${product.price}</span>
+    <div class=" text-white flex gap-1 items-center justify-between w-36 bg-stone-600 shadow rounded-md ">
+       <i class="minus-icon text-xl w-8  text-center fa-solid fa-minus"></i>
+       <input type="number" value="${parseInt(product.quantity)}" class="w-16 h-8 text-black text-sm text-center font-marcel rounded-none" disabled="true"/>
+       <i class="add-icon text-2
+       xl w-8 text-center fa-solid fa-plus"></i>
+    </div>
+    </div>
+    <div class="flex flex-col justify-between items-start pb-1 pr-6  w-32">
+      <p class="text-white font-marcel w-12 text-center text-wrap subtotal">$${(parseFloat(product.price.slice(1)) * product.quantity).toFixed(2)}</p>
+      <button class="del-btn w-16 h-7 text-center bg-black text-sm text-white rounded font-marcel">Delete</button>
+    </div>
+     `
+    cartContainer.appendChild(node)
+    let currentTotal = parseFloat(total.textContent.replace('$', '')) || 0;
+    let newTotal = currentTotal + parseFloat(product.price.slice(1)) * product.quantity;
+    total.textContent = `$${newTotal.toFixed(2)}`;
+    footText.textContent = 'EstimatedTotal:'
+  })
+  const products = document.querySelectorAll('.products')
+  const plusIcons = document.querySelectorAll('.add-icon')
+  const minusIcons = document.querySelectorAll('.minus-icon')
+  const delBtn = document.querySelectorAll('.del-btn')
   
-  // event listeners for favorites page
-  const products = favoritesContainer.querySelectorAll('.products') || []
-  const addCarts = document.querySelectorAll('.add-cart')
-  const hideCashes = document.querySelectorAll('.hide-cash')
-  const imgContainers = document.querySelectorAll('.img-container')
-  const heartIcons = document.querySelectorAll('.hearts')
-  
-  if (stored.length === 0) {
-  span.textContent = "No favorites yet!";
-   }
-   
-  products.forEach(product => {
-    product.addEventListener('click', (e) => {
-      e.stopPropagation()
-      let addCart = product.querySelector('.add-cart')
-      let hideCash = product.querySelector('.hide-cash')
-      let imgContainer = product.querySelector('.img-container')
-      let heartIcon = product.querySelector('.hearts')
-      
-      if (hideCash.classList.contains('translate-y-[-20px]')) {
-        if (e.target.classList.contains('hearts')) {
-          e.target.classList.toggle('text-red-500')
-          e.target.classList.remove('hidden')
-          
-          if (!e.target.classList.contains('text-red-500')) {
-            stored.filter(item => {
-              if (item.id == product.dataset.id) {
-                let removedFav = favoritesContainer.querySelector(`[data-id="${item.id}"]`)
-                favoritesContainer.removeChild(removedFav)
-              }
-            })
-            stored = stored.filter(item => item.id !== product.dataset.id)
-            favoritesArr = favoritesArr.filter(item => item.id !== product.dataset.id)
-            console.log(favoritesArr, stored)
-            localStorage.setItem('favorites', JSON.stringify(favoritesArr))
-            if (stored.length === 0) {
-             span.textContent = "No favorites yet!";
-            }
-          }
-          return
-        }
-        window.location.href = ''
-      } else {
-        clickedProduct(e, addCarts, hideCashes, imgContainers, heartIcons)
-        hideCash.classList.add('translate-y-[-20px]')
-        addCart.classList.add('translate-y-[-23px]')
-        imgContainer.classList.add('scale-[0.9]')
-        heartIcon.classList.remove('hidden')
-      }
+  plusIcons.forEach((add, i) => {
+    const products = document.querySelectorAll('.products')
+    const quantity = products[i].querySelector('input')
+    const price = products[i].querySelector('.price')
+    const subTotal = products[i].querySelector('.subtotal')
+    add.addEventListener('click', (e) => {
+      storedCart[i].quantity++
+      cartsArr[i].quantity++
+      quantity.value++
+      subTotal.textContent = `$${parseFloat((price.textContent.slice(1) * storedCart[i].quantity)).toFixed(2)}`
+      let newTotal = `$${parseFloat(total.textContent.slice(1)) + parseFloat(price.textContent.slice(1))}.00`
+      total.textContent = newTotal
+      localStorage.setItem('carts', JSON.stringify(cartsArr))
     })
   })
+  minusIcons.forEach((minus, i) => {
+    const products = document.querySelectorAll('.products')
+    const quantity = products[i].querySelector('input')
+    const price = products[i].querySelector('.price')
+    const subTotal = products[i].querySelector('.subtotal')
+    minus.addEventListener('click', (e) => {
+      if (quantity.value == 1) {
+        storedCart.filter(item => {
+          if (item.id == products[i].dataset.id) {
+            let node = cartContainer.querySelector(`[data-id="${item.id}"]`)
+            total.textContent = `$${parseFloat(total.textContent.slice(1)) - parseFloat(subTotal.textContent.slice(1))}.00`
+            cartContainer.removeChild(node)
+            storedCart = storedCart.filter(item => item.id !== products[i].dataset.id)
+            cartsArr = cartsArr.filter(item => item.id !== products[i].dataset.id)
+            localStorage.setItem('carts', JSON.stringify(cartsArr))
+            if (storedCart.length == 0) {
+             footText.textContent = ''
+             total.textContent = ''
+             span.textContent = "Nothing in cart yet!"
+            }
+          }
+        })
+        return
+      }
+      storedCart[i].quantity--
+      cartsArr[i].quantity--
+      quantity.value--
+      subTotal.textContent = `$${parseFloat((price.textContent.slice(1) * storedCart[i].quantity)).toFixed(2)}`
+      let newTotal = `$${parseFloat(total.textContent.slice(1)) - parseFloat(price.textContent.slice(1))}.00`
+      total.textContent = newTotal
+      localStorage.setItem('carts', JSON.stringify(cartsArr))
+    })
+  })
+  
+  delBtn.forEach((del, i) => {
+    const subTotal = products[i].querySelector('.subtotal')
+    del.addEventListener('click', () => {
+      storedCart.filter(item => {
+        if (item.id == products[i].dataset.id) {
+          let node = cartContainer.querySelector(`[data-id="${item.id}"]`)
+          total.textContent = `$${parseFloat(total.textContent.slice(1)) - parseFloat(subTotal.textContent.slice(1))}.00`
+          cartContainer.removeChild(node)
+          storedCart = storedCart.filter(item => item.id !== products[i].dataset.id)
+          cartsArr = cartsArr.filter(item => item.id !== products[i].dataset.id)
+          localStorage.setItem('carts', JSON.stringify(cartsArr))
+          if (storedCart.length == 0) {
+           footText.textContent = ''
+           total.textContent = ''
+           span.textContent = "Nothing in cart yet!"
+          }
+        }
+      })
+    })
+  })
+  if (storedCart.length == 0) {
+  footText.textContent = ''
+  total.textContent = ''
+  span.textContent = "Nothing in cart yet!"
+  }
 })
