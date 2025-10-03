@@ -15,9 +15,26 @@ let favorites = getFavorites()
 let carts = getCarts()
 // ========= REFRESH HANDLER =========
 function refreshUI() {
-  getCarts()
-  getFavorites()
+  carts = getCarts()
+  favorites = getFavorites()
+
+  const cartContainer = document.querySelector(".cart-container")
+  const total = document.querySelector(".total")
+  const footText = document.querySelector(".estimate")
+  const cartSpan = document.querySelector(".span")
+
+  if (cartContainer && total && footText && cartSpan) {
+    renderCart(carts, cartContainer, total, footText, cartSpan)
+  }
+
+  const favoritesContainer = document.querySelector(".favorites-container")
+  const favSpan = document.querySelector(".favorites-span")
+
+  if (favoritesContainer && favSpan) {
+    renderFavorites(favorites, favoritesContainer, favSpan)
+  }
 }
+
 
 // ========= INIT EVENTS =========
 document.addEventListener("DOMContentLoaded", refreshUI)
@@ -33,6 +50,83 @@ document.addEventListener("visibilitychange", () => {
     refreshUI()
   }
 })
+function renderFavorites(arr = [], container, span) {
+  container.innerHTML = ""
+
+  arr.forEach(product => {
+    let node = document.createElement('div')
+    node.classList.add(
+      'flex', 'flex-shrink-0', 'w-[48%]', 'flex-col',
+      'gap-1', 'products1', 'shadow', 'p-1', 'bg-stone-400'
+    )
+    node.dataset.id = product.id
+    node.innerHTML = `
+      <div class="relative w-full img-container1 transition-all duration-500 mb-2">
+        <img class="transition-all duration-1000" src="${product.image}" alt="" />
+        <i class="hearts1 fa-regular fa-heart text-xl text-red-500 absolute top-1 right-1 bg-white w-10 h-12 flex items-center justify-center transition-all duration-500 hidden"></i>
+      </div>
+      <h4 class="text-xl w-full font-marcel text-white">${product.name}</h4>
+      <div class="overflow-y-hidden h-6">
+        <span class="hide-cash1 transition-all block duration-500 translate-y-0 text-white">${product.price}</span>
+        <a class="translate-y-[5px] add-cart1 block transition-all duration-500 text-white">ADD TO CART</a>
+      </div>
+    `
+    container.appendChild(node)
+  })
+
+  enableClick(arr, container, span)
+
+  if (arr.length === 0 && span) {
+    span.textContent = "No favorites yet!"
+  }
+}
+
+ function renderCart(arr = [], container, total, footText, span) {
+  container.innerHTML = ""   
+  let newTotal = 0          
+
+  arr.forEach(product => {
+    let div = document.createElement('div')
+    div.classList.add(
+      "flex", "flex-shrink-0", "w-full", "gap-4", "products",
+      "shadow", "p-1", "bg-stone-400", "min-h-40"
+    )
+    div.dataset.id = product.id
+    div.innerHTML = `
+      <div class="relative w-24 h-32 flex-none img-container transition-all duration-500 shadow">
+        <img class="transition-all duration-1000 w-full h-full" src="${product.image}" alt="" />
+      </div>
+      <div class="flex flex-col justify-between pb-1">
+        <h4 class="text-[18px] w-full font-marcel text-white">${product.name}</h4>
+        <span class="hide-cash transition-all block duration-500 text-white font-marcel price">${product.price}</span>
+        <div class="text-white flex gap-1 items-center justify-between w-36 bg-stone-600 shadow rounded-md">
+          <i class="minus-icon text-xl w-8 text-center fa-solid fa-minus"></i>
+          <input type="number" value="${parseInt(product.quantity)}" class="w-16 h-8 text-black text-sm text-center font-marcel rounded-none" disabled />
+          <i class="add-icon text-2xl w-8 text-center fa-solid fa-plus"></i>
+        </div>
+      </div>
+      <div class="flex flex-col justify-between items-start pb-1 pr-6 w-32">
+        <p class="text-white font-marcel w-12 text-center subtotal">
+          $${(parseFloat(product.price.slice(1)) * product.quantity).toFixed(2)}
+        </p>
+        <button class="del-btn w-16 h-7 text-center bg-black text-sm text-white rounded font-marcel">Delete</button>
+      </div>
+    `
+    container.appendChild(div)
+
+    newTotal += parseFloat(product.price.slice(1)) * product.quantity
+  })
+
+  if (arr.length > 0) {
+    total.textContent = `$${newTotal.toFixed(2)}`
+    footText.textContent = "Estimated Total:"
+    span.textContent = ""
+  } else {
+    total.textContent = ""
+    footText.textContent = ""
+    span.textContent = "Nothing in cart yet!"
+  }
+}
 
 // ===============================
 // HELPERS
@@ -68,13 +162,11 @@ function enableClick(fav = [], container, span) {
               price: product.querySelector(`.hide-cash${i}`).textContent,
               image: product.querySelector('img').src
             }
-            if (!favorites.some(item => item.id === productData.id)) {
-              favorites.push(productData)
+            if (!fav.some(item => item.id === productData.id)) {
+              fav.push(productData)
+              setFavorites(fav)
             }
             if (!e.target.classList.contains('text-red-500')) {
-              favorites = favorites.filter(item => item.id !== product.dataset.id)
-            }
-            setFavorites(favorites)
             if (fav.length > 0) {
               fav.filter(item => {
                 if (item.id == product.dataset.id) {
@@ -83,11 +175,13 @@ function enableClick(fav = [], container, span) {
                 }
               })
               fav = fav.filter(item => item.id !== product.dataset.id)
-              setFavorites(favorites)
-              if (fav.length === 0) {
-                span.textContent = "No favorites yet!";
+              setFavorites(fav)
               }
-            }
+              if(fav.length == 0){
+                span.textContent = "No favorites yet!";
+               }
+           }
+           
             return
           }
           if (e.target == addCart || e.target !== heartIcon) {
@@ -191,7 +285,7 @@ document.addEventListener("DOMContentLoaded", () => {
   cartIcon.addEventListener('click', () => {
     window.location.href = 'cart.html'
   })
-  enableClick()
+  enableClick(favorites)
   // -------------------------------
   // SLIDER HELPERS
   // -------------------------------
@@ -407,30 +501,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const favoritesContainer = document.querySelector('.favorites-container')
   const span = document.querySelector('span')
   if (!favoritesContainer) return
-  let favorites = getFavorites()
   // render favorites
-  favorites.forEach(product => {
-    let node = document.createElement('div')
-    node.classList.add('flex', 'flex-shrink-0', 'w-[48%]', 'flex-col', 'gap-1', 'products1', 'shadow', 'p-1', 'bg-stone-400')
-    node.dataset.id = product.id
-    node.innerHTML = `
-      <div class="relative w-full img-container1 transition-all duration-500 mb-2">
-        <img class="transition-all duration-1000" src="${product.image}" alt="" />
-        <i class="hearts1 fa-regular fa-heart text-xl text-red-500 absolute top-1 right-1 bg-white w-10 h-12 flex items-center justify-center transition-all duration-500 hidden"></i>
-      </div>
-      <h4 class="text-xl w-full font-marcel text-white">${product.name}</h4>
-      <div class="overflow-y-hidden h-6">
-        <span class="hide-cash1 transition-all block duration-500 translate-y-0 text-white">${product.price}</span>
-        <a class="translate-y-[5px] add-cart1 block transition-all duration-500 text-white">ADD TO CART</a>
-      </div>`
-    favoritesContainer.appendChild(node)
-  })
-  enableClick(favorites, favoritesContainer, span)
-  if (favorites.length === 0) {
-    span.textContent = "No favorites yet!";
-  }
+  renderFavorites(favorites, favoritesContainer, span)
 })
-
+  
 // ===============================
 // CART HTML LOGIC
 // ===============================
@@ -439,38 +513,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const cartContainer = document.querySelector('.cart-container')
   const total = document.querySelector('.total')
   const footText = document.querySelector('.estimate')
-  const span = document.querySelector('.span')
+  const cartSpan = document.querySelector('.span')
   if (!cartContainer) return
-  let carts = getCarts()
-  carts.forEach(product => {
-    let node = document.createElement('div')
-    node.classList.add('flex', 'flex-shrink-0', 'w-full', 'gap-4', 'products', 'shadow', 'p-1', 'bg-stone-400', 'min-h-40')
-    node.dataset.id = product.id
-    node.innerHTML = `
-      <div class="relative w-24 h-32 flex-none img-container transition-all duration-500 shadow">
-      <img class="transition-all duration-1000 w-full h-full" src="${product.image}" alt="" />
-    </div>
-    <div class="flex flex-col justify-between pb-1">
-      <h4 class="text-[18px] w-full font-marcel text-white">${product.name}</h4>
-      <span class="hide-cash transition-all block duration-500 text-white font-marcel price">${product.price}</span>
-    <div class=" text-white flex gap-1 items-center justify-between w-36 bg-stone-600 shadow rounded-md ">
-       <i class="minus-icon text-xl w-8  text-center fa-solid fa-minus"></i>
-       <input type="number" value="${parseInt(product.quantity)}" class="w-16 h-8 text-black text-sm text-center font-marcel rounded-none" disabled="true"/>
-       <i class="add-icon text-2
-       xl w-8 text-center fa-solid fa-plus"></i>
-    </div>
-    </div>
-    <div class="flex flex-col justify-between items-start pb-1 pr-6  w-32">
-      <p class="text-white font-marcel w-12 text-center text-wrap subtotal">$${(parseFloat(product.price.slice(1)) * product.quantity).toFixed(2)}</p>
-      <button class="del-btn w-16 h-7 text-center bg-black text-sm text-white rounded font-marcel">Delete</button>
-    </div>
-     `
-    cartContainer.appendChild(node)
-    let currentTotal = parseFloat(total.textContent.replace('$', '')) || 0;
-    let newTotal = currentTotal + parseFloat(product.price.slice(1)) * product.quantity;
-    total.textContent = `$${newTotal.toFixed(2)}`;
-    footText.textContent = 'EstimatedTotal:'
-  })
+  
+
+  renderCart(carts, cartContainer, total, footText, cartSpan)
+
   const products = document.querySelectorAll('.products')
   const plusIcons = document.querySelectorAll('.add-icon')
   const minusIcons = document.querySelectorAll('.minus-icon')
