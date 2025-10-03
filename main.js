@@ -374,8 +374,8 @@ document.addEventListener("DOMContentLoaded", () => {
       touchmove(e, testWidth, testimonialsTrack, testIndexRef)
     })
     
-    testimonialsTrack.addEventListener('touchend', () => {
-      touchend(testimonialsTrack, testimonials, testWidth, slideDots4, testIndexRef, 1)
+    testimonialsTrack.addEventListener('touchend', (e) => {
+      touchend(testimonialsTrack, testimonials, testWidth, slideDots4, testIndexRef, 1,e)
     })
   })
 })
