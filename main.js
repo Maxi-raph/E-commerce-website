@@ -14,6 +14,27 @@ function setCarts(arr) {
 let favorites = getFavorites()
 let carts = getCarts()
 
+// ========= REFRESH HANDLER =========
+function refreshUI() {
+  getCarts()
+  getFavorites()
+}
+
+// ========= INIT EVENTS =========
+document.addEventListener("DOMContentLoaded", refreshUI)
+
+window.addEventListener("pageshow", (e) => {
+  if (e.persisted) {
+    refreshUI()
+  }
+})
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") {
+    refreshUI()
+  }
+})
+
 // ===============================
 // HELPERS
 // ===============================
