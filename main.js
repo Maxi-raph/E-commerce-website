@@ -502,7 +502,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const favSpan = document.querySelector('span')
   if (!favoritesContainer) return
   // render favorites
-  renderFavorites(favorites, favoritesContainer, span)
+  renderFavorites(favorites, favoritesContainer, favSpan)
 })
   
 // ===============================
