@@ -28,7 +28,7 @@ function refreshUI() {
   }
 
   const favoritesContainer = document.querySelector(".favorites-container")
-  const favSpan = document.querySelector(".favorites-span")
+  const favSpan = document.querySelector("span")
 
   if (favoritesContainer && favSpan) {
     renderFavorites(favorites, favoritesContainer, favSpan)
