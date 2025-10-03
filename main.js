@@ -13,7 +13,6 @@ function setCarts(arr) {
 }
 let favorites = getFavorites()
 let carts = getCarts()
-
 // ========= REFRESH HANDLER =========
 function refreshUI() {
   getCarts()
@@ -21,6 +20,7 @@ function refreshUI() {
 }
 
 // ========= INIT EVENTS =========
+document.addEventListener("DOMContentLoaded", refreshUI)
 
 window.addEventListener("pageshow", (e) => {
   if (e.persisted) {
