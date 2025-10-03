@@ -1,5 +1,18 @@
-let favoritesArr = JSON.parse(localStorage.getItem('favorites')) || []
-let cartsArr = JSON.parse(localStorage.getItem('carts')) || []
+function getFavorites() {
+  return JSON.parse(localStorage.getItem('favorites')) || []
+}
+function setFavorites(arr) {
+  localStorage.setItem('favorites', JSON.stringify(arr))
+}
+
+function getCarts() {
+  return JSON.parse(localStorage.getItem('carts')) || []
+}
+function setCarts(arr) {
+  localStorage.setItem('carts', JSON.stringify(arr))
+}
+let favorites = getFavorites()
+let carts = getCarts()
 
 // ===============================
 // HELPERS
@@ -10,8 +23,9 @@ function clickedProduct(e, addCarts, hideCashes, imgContainers, heartIcons) {
   imgContainers.forEach(contain => contain.classList.remove('scale-[0.9]'))
   heartIcons.forEach(heart => heart.classList.add('hidden'))
 }
-  function enableClick(storedArr = [],container,span) {
-    
+
+function enableClick(fav = [], container, span) {
+  
   // -------------------------------
   // PRODUCT CLICK HANDLERS (1, 2, 3)
   // -------------------------------
@@ -34,27 +48,26 @@ function clickedProduct(e, addCarts, hideCashes, imgContainers, heartIcons) {
               price: product.querySelector(`.hide-cash${i}`).textContent,
               image: product.querySelector('img').src
             }
-            if (!favoritesArr.some(item => item.id === productData.id)) {
-              favoritesArr.push(productData)
+            if (!favorites.some(item => item.id === productData.id)) {
+              favorites.push(productData)
             }
             if (!e.target.classList.contains('text-red-500')) {
-              favoritesArr = favoritesArr.filter(item => item.id !== product.dataset.id)
+              favorites = favorites.filter(item => item.id !== product.dataset.id)
             }
-            localStorage.setItem('favorites', JSON.stringify(favoritesArr))
- if (storedArr.length > 0) {
-  storedArr.filter(item => {
-    if (item.id == product.dataset.id) {
-      let removedFav = container.querySelector(`[data-id="${item.id}"]`)
-      container.removeChild(removedFav)
-    }
-  })
-  storedArr = storedArr.filter(item => item.id !== product.dataset.id)
-  favoritesArr = favoritesArr.filter(item => item.id !== product.dataset.id)
-  localStorage.setItem('favorites', JSON.stringify(favoritesArr))
-  if (storedArr.length === 0) {
-    span.textContent = "No favorites yet!";
-  }
-}           
+            setFavorites(favorites)
+            if (fav.length > 0) {
+              fav.filter(item => {
+                if (item.id == product.dataset.id) {
+                  let removedFav = container.querySelector(`[data-id="${item.id}"]`)
+                  container.removeChild(removedFav)
+                }
+              })
+              fav = fav.filter(item => item.id !== product.dataset.id)
+              setFavorites(favorites)
+              if (fav.length === 0) {
+                span.textContent = "No favorites yet!";
+              }
+            }
             return
           }
           if (e.target == addCart || e.target !== heartIcon) {
@@ -66,14 +79,13 @@ function clickedProduct(e, addCarts, hideCashes, imgContainers, heartIcons) {
               quantity: 1
             }
             
-            let exists = cartsArr.find(item => item.id == product.dataset.id)
+            let exists = carts.find(item => item.id == product.dataset.id)
             if (exists) {
               exists.quantity++
+            }else{
+              carts.push(productData)
             }
-            if (!cartsArr.some(item => item.id == product.dataset.id)) {
-              cartsArr.push(productData)
-            }
-            localStorage.setItem('carts', JSON.stringify(cartsArr))
+            setCarts(carts)
           }
           window.location.href = 'cart.html'
         } else {
@@ -91,7 +103,7 @@ function clickedProduct(e, addCarts, hideCashes, imgContainers, heartIcons) {
     })
   }
   
-    // -------------------------------
+  // -------------------------------
   // DOCUMENT CLICK RESET
   // -------------------------------
   document.addEventListener('click', () => {
@@ -107,8 +119,8 @@ function clickedProduct(e, addCarts, hideCashes, imgContainers, heartIcons) {
       heartIcons.forEach(heart => heart.classList.add('hidden'))
     }
   })
-  }
-  
+}
+
 // ===============================
 // MAIN PAGE LOGIC
 // ===============================
@@ -116,6 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // -------------------------------
   // DOM ELEMENTS
   // -------------------------------
+  
   const favoritesIcon = document.getElementById('heart-icon')
   const cartIcon = document.getElementById('cart-icon')
   const heading = document.querySelector('#home-text h2')
@@ -180,7 +193,7 @@ document.addEventListener("DOMContentLoaded", () => {
     track.style.transform = `translateX(${offset}px)`
   }
   
-  function touchend(track, contents, width, dots = [], indexRef, visibleCount,event) {
+  function touchend(track, contents, width, dots = [], indexRef, visibleCount, event) {
     delta = endX - startX
     if (event.target.classList.contains('hearts1') || event.target.classList.contains('hearts2') || event.target.classList.contains('hearts3')) return
     if (delta < -50 && indexRef.value < contents.length - visibleCount) {
@@ -344,7 +357,7 @@ document.addEventListener("DOMContentLoaded", () => {
       
       productTrack.addEventListener('touchstart', (e) => { touchstart(e, productTrack) })
       productTrack.addEventListener('touchmove', (e) => { touchmove(e, prodWidth, productTrack, prodIndexRef) })
-      productTrack.addEventListener('touchend', (e) => { touchend(productTrack, products, prodWidth, slideDots, prodIndexRef, 2,e) })
+      productTrack.addEventListener('touchend', (e) => { touchend(productTrack, products, prodWidth, slideDots, prodIndexRef, 2, e) })
     }
     
     // ===============================
@@ -374,9 +387,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const favoritesContainer = document.querySelector('.favorites-container')
   const span = document.querySelector('span')
   if (!favoritesContainer) return
-  let storedFav = JSON.parse(localStorage.getItem('favorites')) || []
+  let favorites = getFavorites()
   // render favorites
-  storedFav.forEach(product => {
+  favorites.forEach(product => {
     let node = document.createElement('div')
     node.classList.add('flex', 'flex-shrink-0', 'w-[48%]', 'flex-col', 'gap-1', 'products1', 'shadow', 'p-1', 'bg-stone-400')
     node.dataset.id = product.id
@@ -392,8 +405,8 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>`
     favoritesContainer.appendChild(node)
   })
-  enableClick(storedFav,favoritesContainer,span)
-  if (storedFav.length === 0) {
+  enableClick(favorites, favoritesContainer, span)
+  if (favorites.length === 0) {
     span.textContent = "No favorites yet!";
   }
 })
@@ -402,13 +415,14 @@ document.addEventListener('DOMContentLoaded', () => {
 // CART HTML LOGIC
 // ===============================
 document.addEventListener('DOMContentLoaded', () => {
+  
   const cartContainer = document.querySelector('.cart-container')
   const total = document.querySelector('.total')
   const footText = document.querySelector('.estimate')
   const span = document.querySelector('.span')
   if (!cartContainer) return
-  let storedCart = JSON.parse(localStorage.getItem('carts')) || []
-  storedCart.forEach(product => {
+  let carts = getCarts()
+  carts.forEach(product => {
     let node = document.createElement('div')
     node.classList.add('flex', 'flex-shrink-0', 'w-full', 'gap-4', 'products', 'shadow', 'p-1', 'bg-stone-400', 'min-h-40')
     node.dataset.id = product.id
@@ -442,19 +456,32 @@ document.addEventListener('DOMContentLoaded', () => {
   const minusIcons = document.querySelectorAll('.minus-icon')
   const delBtn = document.querySelectorAll('.del-btn')
   
+  function clearCart(i, subTotal) {
+     let data = carts.find(item =>item.id == products[i].dataset.id)
+        let node = cartContainer.querySelector(`[data-id="${data.id}"]`)
+        total.textContent = `$${(parseFloat(total.textContent.slice(1)) - parseFloat(subTotal.textContent.slice(1))).toFixed(2)}`
+        cartContainer.removeChild(node)
+        carts = carts.filter(item => item.id !== products[i].dataset.id)
+         setCarts(carts)
+        if (carts.length == 0) {
+          footText.textContent = ''
+          total.textContent = ''
+          span.textContent = "Nothing in cart yet!"
+        }
+  }
+  
   plusIcons.forEach((add, i) => {
     const products = document.querySelectorAll('.products')
     const quantity = products[i].querySelector('input')
     const price = products[i].querySelector('.price')
     const subTotal = products[i].querySelector('.subtotal')
     add.addEventListener('click', (e) => {
-      storedCart[i].quantity++
-      cartsArr[i].quantity++
+      carts[i].quantity++
       quantity.value++
-      subTotal.textContent = `$${parseFloat((price.textContent.slice(1) * storedCart[i].quantity)).toFixed(2)}`
-      let newTotal = `$${parseFloat(total.textContent.slice(1)) + parseFloat(price.textContent.slice(1))}.00`
+      subTotal.textContent = `$${(parseFloat((price.textContent.slice(1) * carts[i].quantity))).toFixed(2)}`
+      let newTotal = `$${(parseFloat(total.textContent.slice(1)) + parseFloat(price.textContent.slice(1))).toFixed(2)}`
       total.textContent = newTotal
-      localStorage.setItem('carts', JSON.stringify(cartsArr))
+      setCarts(carts)
     })
   })
   minusIcons.forEach((minus, i) => {
@@ -464,56 +491,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const subTotal = products[i].querySelector('.subtotal')
     minus.addEventListener('click', (e) => {
       if (quantity.value == 1) {
-        storedCart.filter(item => {
-          if (item.id == products[i].dataset.id) {
-            let node = cartContainer.querySelector(`[data-id="${item.id}"]`)
-            total.textContent = `$${parseFloat(total.textContent.slice(1)) - parseFloat(subTotal.textContent.slice(1))}.00`
-            cartContainer.removeChild(node)
-            storedCart = storedCart.filter(item => item.id !== products[i].dataset.id)
-            cartsArr = cartsArr.filter(item => item.id !== products[i].dataset.id)
-            localStorage.setItem('carts', JSON.stringify(cartsArr))
-            if (storedCart.length == 0) {
-             footText.textContent = ''
-             total.textContent = ''
-             span.textContent = "Nothing in cart yet!"
-            }
-          }
-        })
+        clearCart(i, subTotal)
         return
       }
-      storedCart[i].quantity--
-      cartsArr[i].quantity--
+      carts[i].quantity--
       quantity.value--
-      subTotal.textContent = `$${parseFloat((price.textContent.slice(1) * storedCart[i].quantity)).toFixed(2)}`
-      let newTotal = `$${parseFloat(total.textContent.slice(1)) - parseFloat(price.textContent.slice(1))}.00`
+      subTotal.textContent = `$${(parseFloat((price.textContent.slice(1) * carts[i].quantity))).toFixed(2)}`
+      let newTotal = `$${(parseFloat(total.textContent.slice(1)) - parseFloat(price.textContent.slice(1))).toFixed(2)}`
       total.textContent = newTotal
-      localStorage.setItem('carts', JSON.stringify(cartsArr))
+      setCarts(carts)
     })
   })
   
   delBtn.forEach((del, i) => {
     const subTotal = products[i].querySelector('.subtotal')
     del.addEventListener('click', () => {
-      storedCart.filter(item => {
-        if (item.id == products[i].dataset.id) {
-          let node = cartContainer.querySelector(`[data-id="${item.id}"]`)
-          total.textContent = `$${parseFloat(total.textContent.slice(1)) - parseFloat(subTotal.textContent.slice(1))}.00`
-          cartContainer.removeChild(node)
-          storedCart = storedCart.filter(item => item.id !== products[i].dataset.id)
-          cartsArr = cartsArr.filter(item => item.id !== products[i].dataset.id)
-          localStorage.setItem('carts', JSON.stringify(cartsArr))
-          if (storedCart.length == 0) {
-           footText.textContent = ''
-           total.textContent = ''
-           span.textContent = "Nothing in cart yet!"
-          }
-        }
-      })
+      clearCart(i, subTotal)
     })
   })
-  if (storedCart.length == 0) {
-  footText.textContent = ''
-  total.textContent = ''
-  span.textContent = "Nothing in cart yet!"
+  if (carts.length == 0) {
+    footText.textContent = ''
+    total.textContent = ''
+    span.textContent = "Nothing in cart yet!"
   }
 })
