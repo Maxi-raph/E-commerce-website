@@ -15,6 +15,7 @@ let favorites = getFavorites()
 let carts = getCarts()
 // ========= REFRESH HANDLER =========
 function refreshUI() {
+  
   carts = getCarts()
   favorites = getFavorites()
 
@@ -84,7 +85,6 @@ function renderFavorites(arr = [], container, span) {
  function renderCart(arr = [], container, total, footText, span) {
   container.innerHTML = ""   
   let newTotal = 0          
-
   arr.forEach(product => {
     let div = document.createElement('div')
     div.classList.add(
@@ -114,10 +114,11 @@ function renderFavorites(arr = [], container, span) {
     `
     container.appendChild(div)
 
-    newTotal += parseFloat(product.price.slice(1)) * product.quantity
+    newTotal += parseFloat(product.price.slice(1)) * Number(product.quantity)
+    
   })
-
-  if (arr.length > 0) {
+  
+  if (arr.length > 0){
     total.textContent = `$${newTotal.toFixed(2)}`
     footText.textContent = "Estimated Total:"
     span.textContent = ""
@@ -201,7 +202,6 @@ function enableClick(fav = [], container, span) {
             }
             setCarts(carts)
           }
-          window.location.href = 'cart.html'
         } else {
           const addCarts = document.querySelectorAll(`.add-cart${i}`)
           const hideCashes = document.querySelectorAll(`.hide-cash${i}`)
@@ -509,72 +509,83 @@ document.addEventListener('DOMContentLoaded', () => {
 // CART HTML LOGIC
 // ===============================
 document.addEventListener('DOMContentLoaded', () => {
-  
   const cartContainer = document.querySelector('.cart-container')
   const total = document.querySelector('.total')
   const footText = document.querySelector('.estimate')
   const cartSpan = document.querySelector('.span')
   if (!cartContainer) return
   
-
   renderCart(carts, cartContainer, total, footText, cartSpan)
-
+  
   const products = document.querySelectorAll('.products')
   const plusIcons = document.querySelectorAll('.add-icon')
   const minusIcons = document.querySelectorAll('.minus-icon')
   const delBtn = document.querySelectorAll('.del-btn')
   
-  function clearCart(i, subTotal) {
-     let data = carts.find(item =>item.id == products[i].dataset.id)
-        let node = cartContainer.querySelector(`[data-id="${data.id}"]`)
-        total.textContent = `$${(parseFloat(total.textContent.slice(1)) - parseFloat(subTotal.textContent.slice(1))).toFixed(2)}`
-        cartContainer.removeChild(node)
-        carts = carts.filter(item => item.id !== products[i].dataset.id)
-         setCarts(carts)
-        if (carts.length == 0) {
-          footText.textContent = ''
-          total.textContent = ''
-          span.textContent = "Nothing in cart yet!"
-        }
+  function clearCart(i) {
+  let data = carts.find(item => item.id == products[i].dataset.id);
+  let node = cartContainer.querySelector(`[data-id="${data.id}"]`);
+  cartContainer.removeChild(node);
+  carts = carts.filter(item => item.id !== products[i].dataset.id);
+  setCarts(carts);
+  updateTotal()
+  }
+  
+  function updateTotal() {
+  const newTotal = carts.reduce((acc, item) => {
+    return acc + parseFloat(item.price.slice(1)) * item.quantity
+  }, 0)
+  total.textContent = newTotal > 0 ? `$${newTotal.toFixed(2)}` : ''
+  footText.textContent = newTotal > 0 ? 'Estimated Total:' : ''
+  cartSpan.textContent = newTotal > 0 ? '' : 'Nothing in cart yet!'
   }
   
   plusIcons.forEach((add, i) => {
-    const products = document.querySelectorAll('.products')
-    const quantity = products[i].querySelector('input')
-    const price = products[i].querySelector('.price')
-    const subTotal = products[i].querySelector('.subtotal')
     add.addEventListener('click', (e) => {
-      carts[i].quantity++
+      console.log(i)
+      carts.find((item,j) => {
+      if (item.id == products[i].dataset.id) {
+      const product = document.querySelector(`[data-id="${item.id}"]`)
+      const quantity = product.querySelector('input')
+      const price = product.querySelector('.price')
+      const subTotal = product.querySelector('.subtotal')
+      carts[j].quantity++
       quantity.value++
-      subTotal.textContent = `$${(parseFloat((price.textContent.slice(1) * carts[i].quantity))).toFixed(2)}`
+      subTotal.textContent = `$${(parseFloat((price.textContent.slice(1) * carts[j].quantity))).toFixed(2)}`
       let newTotal = `$${(parseFloat(total.textContent.slice(1)) + parseFloat(price.textContent.slice(1))).toFixed(2)}`
       total.textContent = newTotal
       setCarts(carts)
+       }
+      })
     })
   })
   minusIcons.forEach((minus, i) => {
-    const products = document.querySelectorAll('.products')
-    const quantity = products[i].querySelector('input')
-    const price = products[i].querySelector('.price')
-    const subTotal = products[i].querySelector('.subtotal')
     minus.addEventListener('click', (e) => {
-      if (quantity.value == 1) {
-        clearCart(i, subTotal)
-        return
+  carts.find((item, j) => {
+  if (item.id == products[i].dataset.id) {
+    const product = document.querySelector(`[data-id="${item.id}"]`)
+    const quantity = product.querySelector('input')
+    const price = product.querySelector('.price')
+    const subTotal = product.querySelector('.subtotal')
+    carts[j].quantity--
+    quantity.value--
+    subTotal.textContent = `$${(parseFloat((price.textContent.slice(1) * carts[j].quantity))).toFixed(2)}`
+    let newTotal = `$${(parseFloat(total.textContent.slice(1)) - parseFloat(price.textContent.slice(1))).toFixed(2)}`
+    total.textContent = newTotal
+    setCarts(carts)
+    if (quantity.value == 0) {
+      clearCart(i)
+      return
+    }
       }
-      carts[i].quantity--
-      quantity.value--
-      subTotal.textContent = `$${(parseFloat((price.textContent.slice(1) * carts[i].quantity))).toFixed(2)}`
-      let newTotal = `$${(parseFloat(total.textContent.slice(1)) - parseFloat(price.textContent.slice(1))).toFixed(2)}`
-      total.textContent = newTotal
-      setCarts(carts)
+     })
     })
   })
   
   delBtn.forEach((del, i) => {
     const subTotal = products[i].querySelector('.subtotal')
     del.addEventListener('click', () => {
-      clearCart(i, subTotal)
+      clearCart(i)
     })
   })
   if (carts.length == 0) {
@@ -582,4 +593,55 @@ document.addEventListener('DOMContentLoaded', () => {
     total.textContent = ''
     span.textContent = "Nothing in cart yet!"
   }
+  
+})
+function updateTotal() {
+  const newTotal = carts.reduce((acc,
+    item) => {
+    return acc + parseFloat(item.price
+      .slice(1)) * item.quantity
+  }, 0)
+  total.textContent = newTotal > 0 ?
+    `$${newTotal.toFixed(2)}` : ''
+  footText.textContent = newTotal > 0 ?
+    'Estimated Total:' : ''
+  cartSpan.textContent = newTotal > 0 ?
+    '' : 'Nothing in cart yet!'
+}
+
+cartContainer.addEventListener("click", (e) => {
+  const product = e.target.closest(".products")
+  if (!product) return
+  
+  const id = product.dataset.id
+  const item = carts.find(p => p.id == id)
+  if (!item) return
+  
+  const quantity = product.querySelector("input")
+  const price = product.querySelector(".price")
+  const subTotal = product.querySelector(".subtotal")
+  
+  if (e.target.classList.contains("add-icon")) {
+    item.quantity++
+  }
+  if (e.target.classList.contains("minus-icon")) {
+    item.quantity--
+    if (item.quantity <= 0) {
+      carts = carts.filter(p => p.id !== id)
+      renderCart(carts, cartContainer, total, footText, cartSpan)
+      setCarts(carts)
+      return
+    }
+  }
+  if (e.target.classList.contains("del-btn")) {
+    carts = carts.filter(p => p.id !== id)
+    renderCart(carts, cartContainer, total, footText, cartSpan)
+    setCarts(carts)
+    return
+  }
+  
+  quantity.value = item.quantity
+  subTotal.textContent = `$${(parseFloat(price.textContent.slice(1)) * item.quantity).toFixed(2)}`
+  updateTotal()
+  setCarts(carts)
 })
