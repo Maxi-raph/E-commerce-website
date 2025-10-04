@@ -1,6 +1,10 @@
+// ===============================
+// STORAGE MANAGEMENT
+// ===============================
 function getFavorites() {
   return JSON.parse(localStorage.getItem('favorites')) || []
 }
+
 function setFavorites(arr) {
   localStorage.setItem('favorites', JSON.stringify(arr))
 }
@@ -8,49 +12,17 @@ function setFavorites(arr) {
 function getCarts() {
   return JSON.parse(localStorage.getItem('carts')) || []
 }
+
 function setCarts(arr) {
   localStorage.setItem('carts', JSON.stringify(arr))
 }
+
 let favorites = getFavorites()
 let carts = getCarts()
-// ========= REFRESH HANDLER =========
-function refreshUI() {
-  
-  carts = getCarts()
-  favorites = getFavorites()
 
-  const cartContainer = document.querySelector(".cart-container")
-  const total = document.querySelector(".total")
-  const footText = document.querySelector(".estimate")
-  const cartSpan = document.querySelector(".span")
-
-  if (cartContainer && total && footText && cartSpan) {
-    renderCart(carts, cartContainer, total, footText, cartSpan)
-  }
-
-  const favoritesContainer = document.querySelector(".favorites-container")
-  const favSpan = document.querySelector("span")
-
-  if (favoritesContainer && favSpan) {
-    renderFavorites(favorites, favoritesContainer, favSpan)
-  }
-}
-
-
-// ========= INIT EVENTS =========
-document.addEventListener("DOMContentLoaded", refreshUI)
-
-window.addEventListener("pageshow", (e) => {
-  if (e.persisted) {
-    refreshUI()
-  }
-})
-
-document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "visible") {
-    refreshUI()
-  }
-})
+// ===============================
+// UI RENDERING FUNCTIONS
+// ===============================
 function renderFavorites(arr = [], container, span) {
   container.innerHTML = ""
 
@@ -82,7 +54,7 @@ function renderFavorites(arr = [], container, span) {
   }
 }
 
- function renderCart(arr = [], container, total, footText, span) {
+function renderCart(arr = [], container, total, footText, span) {
   container.innerHTML = ""   
   let newTotal = 0          
   arr.forEach(product => {
@@ -115,7 +87,6 @@ function renderFavorites(arr = [], container, span) {
     container.appendChild(div)
 
     newTotal += parseFloat(product.price.slice(1)) * Number(product.quantity)
-    
   })
   
   if (arr.length > 0){
@@ -130,7 +101,137 @@ function renderFavorites(arr = [], container, span) {
 }
 
 // ===============================
-// HELPERS
+// EVENT HANDLING FUNCTIONS
+// ===============================
+function bindCartEvents(cartContainer, total, footText, cartSpan) {
+  cartContainer = document.querySelector(".cart-container")
+  total = document.querySelector(".total")
+  footText = document.querySelector(".estimate")
+  cartSpan = document.querySelector(".span")
+  
+  const products = document.querySelectorAll('.products')
+  const plusIcons = document.querySelectorAll('.add-icon')
+  const minusIcons = document.querySelectorAll('.minus-icon')
+  const delBtn = document.querySelectorAll('.del-btn')
+
+  function updateTotal() {
+    const newTotal = carts.reduce((acc, item) => {
+      return acc + parseFloat(item.price.slice(1)) * item.quantity
+    }, 0)
+    total.textContent = newTotal > 0 ? `$${newTotal.toFixed(2)}` : ''
+    footText.textContent = newTotal > 0 ? 'Estimated Total:' : ''
+    cartSpan.textContent = newTotal > 0 ? '' : 'Nothing in cart yet!'
+  }
+
+  function clearCart(i) {
+    let data = carts.find(item => item.id == products[i].dataset.id)
+    let node = cartContainer.querySelector(`[data-id="${data.id}"]`)
+    cartContainer.removeChild(node)
+    carts = carts.filter(item => item.id !== products[i].dataset.id)
+    setCarts(carts)
+    updateTotal()
+  }
+
+  plusIcons.forEach((add, i) => {
+    add.addEventListener('click', () => {
+      carts.find((item, j) => {
+        if (item.id == products[i].dataset.id) {
+          const product = document.querySelector(`[data-id="${item.id}"]`)
+          const quantity = product.querySelector('input')
+          const price = product.querySelector('.price')
+          const subTotal = product.querySelector('.subtotal')
+
+          carts[j].quantity++
+          quantity.value++
+          subTotal.textContent = `$${(parseFloat(price.textContent.slice(1)) * carts[j].quantity).toFixed(2)}`
+          setCarts(carts)
+          updateTotal()
+        }
+      })
+    })
+  })
+
+  minusIcons.forEach((minus, i) => {
+    minus.addEventListener('click', () => {
+      carts.find((item, j) => {
+        if (item.id == products[i].dataset.id) {
+          const product = document.querySelector(`[data-id="${item.id}"]`)
+          const quantity = product.querySelector('input')
+          const price = product.querySelector('.price')
+          const subTotal = product.querySelector('.subtotal')
+
+          carts[j].quantity--
+          quantity.value--
+          subTotal.textContent = `$${(parseFloat(price.textContent.slice(1)) * carts[j].quantity).toFixed(2)}`
+          setCarts(carts)
+          updateTotal()
+
+          if (quantity.value == 0) {
+            clearCart(i)
+          }
+        }
+      })
+    })
+  })
+
+  delBtn.forEach((del, i) => {
+    del.addEventListener('click', () => clearCart(i))
+  })
+}
+
+// ===============================
+// UI REFRESH HANDLER
+// ===============================
+function refreshUI() {
+  carts = getCarts()
+  favorites = getFavorites()
+
+  const cartContainer = document.querySelector(".cart-container")
+  const total = document.querySelector(".total")
+  const footText = document.querySelector(".estimate")
+  const cartSpan = document.querySelector(".span")
+
+  if (cartContainer && total && footText && cartSpan) {
+    renderCart(carts, cartContainer, total, footText, cartSpan)
+    bindCartEvents(carts, cartContainer, total, footText, cartSpan)
+  }
+
+  const favoritesContainer = document.querySelector(".favorites-container")
+  const favSpan = document.querySelector("span")
+
+  if (favoritesContainer && favSpan) {
+    renderFavorites(favorites, favoritesContainer, favSpan)
+  }
+}
+// ===============================
+// GLOBAL VARIABLES FOR SLIDERS
+// ===============================
+let heroIndexRef = { value: 0 }
+let prodIndexRef = { value: 0 }
+let testIndexRef = { value: 0 }
+let startX = 0
+let endX = 0
+let delta = 0
+
+// ===============================
+// INITIALIZATION EVENTS
+// ===============================
+document.addEventListener("DOMContentLoaded", refreshUI)
+
+window.addEventListener("pageshow", (e) => {
+  if (e.persisted) {
+    refreshUI()
+  }
+})
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") {
+    refreshUI()
+  }
+})
+
+// ===============================
+// INTERACTION HELPERS
 // ===============================
 function clickedProduct(e, addCarts, hideCashes, imgContainers, heartIcons) {
   addCarts.forEach(cart => cart.classList.remove('translate-y-[-23px]'))
@@ -140,10 +241,7 @@ function clickedProduct(e, addCarts, hideCashes, imgContainers, heartIcons) {
 }
 
 function enableClick(fav = [], container, span) {
-  
-  // -------------------------------
   // PRODUCT CLICK HANDLERS (1, 2, 3)
-  // -------------------------------
   for (let i = 1; i < 4; i++) {
     document.querySelectorAll(`.products${i}`).forEach(product => {
       product.addEventListener('click', (e) => {
@@ -168,21 +266,20 @@ function enableClick(fav = [], container, span) {
               setFavorites(fav)
             }
             if (!e.target.classList.contains('text-red-500')) {
-            if (fav.length > 0) {
-              fav.filter(item => {
-                if (item.id == product.dataset.id) {
-                  let removedFav = container.querySelector(`[data-id="${item.id}"]`)
-                  container.removeChild(removedFav)
-                }
-              })
-              fav = fav.filter(item => item.id !== product.dataset.id)
-              setFavorites(fav)
+              if (fav.length > 0) {
+                fav.filter(item => {
+                  if (item.id == product.dataset.id) {
+                    let removedFav = container.querySelector(`[data-id="${item.id}"]`)
+                    container.removeChild(removedFav)
+                  }
+                })
+                fav = fav.filter(item => item.id !== product.dataset.id)
+                setFavorites(fav)
               }
               if(fav.length == 0){
                 span.textContent = "No favorites yet!";
-               }
-           }
-           
+              }
+            }
             return
           }
           if (e.target == addCart || e.target !== heartIcon) {
@@ -217,9 +314,7 @@ function enableClick(fav = [], container, span) {
     })
   }
   
-  // -------------------------------
   // DOCUMENT CLICK RESET
-  // -------------------------------
   document.addEventListener('click', () => {
     for (let i = 1; i < 4; i++) {
       const addCarts = document.querySelectorAll(`.add-cart${i}`)
@@ -236,13 +331,66 @@ function enableClick(fav = [], container, span) {
 }
 
 // ===============================
+// SLIDER HELPERS
+// ===============================
+function touchstart(event, track) {
+  startX = event.touches[0].clientX
+  track.style.transition = 'none'
+}
+
+function touchmove(event, width, track, indexRef) {
+  endX = event.touches[0].clientX
+  delta = endX - startX
+  let offset = -indexRef.value * width + delta
+  track.style.transform = `translateX(${offset}px)`
+}
+
+function touchend(track, contents, width, dots = [], indexRef, visibleCount, event) {
+  delta = endX - startX
+  if (event.target.classList.contains('hearts1') || event.target.classList.contains('hearts2') || event.target.classList.contains('hearts3')) return
+  if (delta < -50 && indexRef.value < contents.length - visibleCount) {
+    indexRef.value++
+  } else if (delta > 50 && indexRef.value > 0) {
+    indexRef.value--
+  }
+  track.style.transition = 'transform 0.6s ease'
+  track.style.transform = `translateX(${-indexRef.value * width}px)`
+  
+  dots.forEach(dot => {
+    dot.classList.remove('bg-stone-400')
+    dots[indexRef.value].classList.add('bg-stone-400')
+  })
+}
+
+function heroTouchend(track, contents, width, indexRef) {
+  delta = endX - startX
+  if (delta < -50 && indexRef.value < contents.length) {
+    indexRef.value++
+    if (indexRef.value == contents.length) {
+      indexRef.value = 0
+      track.style.transition = 'none'
+      track.style.transform = `translateX(${-indexRef.value * width}px)`
+      return
+    }
+  } else if (delta > 50 && indexRef.value > -1) {
+    indexRef.value--
+    if (indexRef.value == -1) {
+      indexRef.value = contents.length - 1
+      track.style.transition = 'none'
+      track.style.transform = `translateX(${-indexRef.value * width}px)`
+      return
+    }
+  }
+  
+  track.style.transition = 'transform 0.6s ease'
+  track.style.transform = `translateX(${-indexRef.value * width}px)`
+}
+
+// ===============================
 // MAIN PAGE LOGIC
 // ===============================
 document.addEventListener("DOMContentLoaded", () => {
-  // -------------------------------
   // DOM ELEMENTS
-  // -------------------------------
-  
   const favoritesIcon = document.getElementById('heart-icon')
   const cartIcon = document.getElementById('cart-icon')
   const heading = document.querySelector('#home-text h2')
@@ -274,9 +422,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const testimonials = document.querySelectorAll('.testimonials')
   const slideDots4 = document.querySelectorAll('.slider-dots4')
   
-  // -------------------------------
-  // FAVORITES ICON
-  // -------------------------------
+  // FAVORITES AND CART ICONS
   if (!favoritesIcon) return
   favoritesIcon.addEventListener('click', () => {
     window.location.href = 'favorites.html'
@@ -285,72 +431,10 @@ document.addEventListener("DOMContentLoaded", () => {
   cartIcon.addEventListener('click', () => {
     window.location.href = 'cart.html'
   })
+  
   enableClick(favorites)
-  // -------------------------------
-  // SLIDER HELPERS
-  // -------------------------------
-  let heroIndexRef = { value: 0 }
-  let prodIndexRef = { value: 0 }
-  let testIndexRef = { value: 0 }
-  let startX = 0
-  let endX = 0
-  
-  function touchstart(event, track) {
-    startX = event.touches[0].clientX
-    track.style.transition = 'none'
-  }
-  
-  function touchmove(event, width, track, indexRef) {
-    endX = event.touches[0].clientX
-    delta = endX - startX
-    let offset = -indexRef.value * width + delta
-    track.style.transform = `translateX(${offset}px)`
-  }
-  
-  function touchend(track, contents, width, dots = [], indexRef, visibleCount, event) {
-    delta = endX - startX
-    if (event.target.classList.contains('hearts1') || event.target.classList.contains('hearts2') || event.target.classList.contains('hearts3')) return
-    if (delta < -50 && indexRef.value < contents.length - visibleCount) {
-      indexRef.value++
-    } else if (delta > 50 && indexRef.value > 0) {
-      indexRef.value--
-    }
-    track.style.transition = 'transform 0.6s ease'
-    track.style.transform = `translateX(${-indexRef.value * width}px)`
-    
-    dots.forEach(dot => {
-      dot.classList.remove('bg-stone-400')
-      dots[indexRef.value].classList.add('bg-stone-400')
-    })
-  }
-  
-  function heroTouchend(track, contents, width, indexRef) {
-    delta = endX - startX
-    if (delta < -50 && indexRef.value < contents.length) {
-      indexRef.value++
-      if (indexRef.value == contents.length) {
-        indexRef.value = 0
-        track.style.transition = 'none'
-        track.style.transform = `translateX(${-indexRef.value * width}px)`
-        return
-      }
-    } else if (delta > 50 && indexRef.value > -1) {
-      indexRef.value--
-      if (indexRef.value == -1) {
-        indexRef.value = contents.length - 1
-        track.style.transition = 'none'
-        track.style.transform = `translateX(${-indexRef.value * width}px)`
-        return
-      }
-    }
-    
-    track.style.transition = 'transform 0.6s ease'
-    track.style.transform = `translateX(${-indexRef.value * width}px)`
-  }
-  
-  // -------------------------------
+
   // HERO SECTION ANIMATIONS
-  // -------------------------------
   heading.classList.replace('translate-y-32', 'translate-y-0')
   heading.classList.add('opacity-100')
   hamburger.classList.add('translate-x-0', 'opacity-100')
@@ -365,9 +449,7 @@ document.addEventListener("DOMContentLoaded", () => {
     heroContain.classList.add('opacity-100')
   }, 300)
   
-  // -------------------------------
   // HERO TOUCH HANDLERS
-  // -------------------------------
   let heroStyle = window.getComputedStyle(heroContents[0])
   let gap = parseInt(heroStyle.marginRight) || 0
   let heroWidth = heroContents[0].offsetWidth + gap
@@ -383,9 +465,7 @@ document.addEventListener("DOMContentLoaded", () => {
   heroTrack.addEventListener('touchmove', (e) => { touchmove(e, heroWidth, heroTrack, heroIndexRef) })
   heroTrack.addEventListener('touchend', () => { heroTouchend(heroTrack, heroContents, heroWidth, heroIndexRef) })
   
-  // -------------------------------
   // INTERSECTION OBSERVERS
-  // -------------------------------
   let observer1 = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
@@ -419,9 +499,7 @@ document.addEventListener("DOMContentLoaded", () => {
   productsContainer.forEach(container => observer3.observe(container))
   observer3.observe(videoframe)
   
-  // -------------------------------
   // RESET SLIDERS WHEN OUT OF VIEW
-  // -------------------------------
   let trackObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (!entry.isIntersecting) {
@@ -452,13 +530,10 @@ document.addEventListener("DOMContentLoaded", () => {
   productsContainer.forEach(container => { trackObserver.observe(container) })
   trackObserver.observe(heroContain)
   trackObserver.observe(testimonialsContain)
-  // -------------------------------
+  
   // WINDOW LOAD → SLIDER TOUCH SETUP
-  // -------------------------------
   window.addEventListener('load', () => {
-    // ===============================
     // PRODUCT SLIDER TOUCH
-    // ===============================
     for (let i = 1; i < 4; i++) {
       const productTrack = document.querySelector(`.products-track${i}`)
       const products = document.querySelectorAll(`.products${i}`)
@@ -474,9 +549,7 @@ document.addEventListener("DOMContentLoaded", () => {
       productTrack.addEventListener('touchend', (e) => { touchend(productTrack, products, prodWidth, slideDots, prodIndexRef, 2, e) })
     }
     
-    // ===============================
     // TESTIMONIALS SLIDER TOUCH
-    // ===============================
     let testStyles = window.getComputedStyle(testimonials[0])
     let testWidth = parseInt(testStyles.width)
     
@@ -501,7 +574,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const favoritesContainer = document.querySelector('.favorites-container')
   const favSpan = document.querySelector('span')
   if (!favoritesContainer) return
-  // render favorites
   renderFavorites(favorites, favoritesContainer, favSpan)
 })
   
@@ -516,132 +588,5 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!cartContainer) return
   
   renderCart(carts, cartContainer, total, footText, cartSpan)
-  
-  const products = document.querySelectorAll('.products')
-  const plusIcons = document.querySelectorAll('.add-icon')
-  const minusIcons = document.querySelectorAll('.minus-icon')
-  const delBtn = document.querySelectorAll('.del-btn')
-  
-  function clearCart(i) {
-  let data = carts.find(item => item.id == products[i].dataset.id);
-  let node = cartContainer.querySelector(`[data-id="${data.id}"]`);
-  cartContainer.removeChild(node);
-  carts = carts.filter(item => item.id !== products[i].dataset.id);
-  setCarts(carts);
-  updateTotal()
-  }
-  
-  function updateTotal() {
-  const newTotal = carts.reduce((acc, item) => {
-    return acc + parseFloat(item.price.slice(1)) * item.quantity
-  }, 0)
-  total.textContent = newTotal > 0 ? `$${newTotal.toFixed(2)}` : ''
-  footText.textContent = newTotal > 0 ? 'Estimated Total:' : ''
-  cartSpan.textContent = newTotal > 0 ? '' : 'Nothing in cart yet!'
-  }
-  
-  plusIcons.forEach((add, i) => {
-    add.addEventListener('click', (e) => {
-      console.log(i)
-      carts.find((item,j) => {
-      if (item.id == products[i].dataset.id) {
-      const product = document.querySelector(`[data-id="${item.id}"]`)
-      const quantity = product.querySelector('input')
-      const price = product.querySelector('.price')
-      const subTotal = product.querySelector('.subtotal')
-      carts[j].quantity++
-      quantity.value++
-      subTotal.textContent = `$${(parseFloat((price.textContent.slice(1) * carts[j].quantity))).toFixed(2)}`
-      let newTotal = `$${(parseFloat(total.textContent.slice(1)) + parseFloat(price.textContent.slice(1))).toFixed(2)}`
-      total.textContent = newTotal
-      setCarts(carts)
-       }
-      })
-    })
-  })
-  minusIcons.forEach((minus, i) => {
-    minus.addEventListener('click', (e) => {
-  carts.find((item, j) => {
-  if (item.id == products[i].dataset.id) {
-    const product = document.querySelector(`[data-id="${item.id}"]`)
-    const quantity = product.querySelector('input')
-    const price = product.querySelector('.price')
-    const subTotal = product.querySelector('.subtotal')
-    carts[j].quantity--
-    quantity.value--
-    subTotal.textContent = `$${(parseFloat((price.textContent.slice(1) * carts[j].quantity))).toFixed(2)}`
-    let newTotal = `$${(parseFloat(total.textContent.slice(1)) - parseFloat(price.textContent.slice(1))).toFixed(2)}`
-    total.textContent = newTotal
-    setCarts(carts)
-    if (quantity.value == 0) {
-      clearCart(i)
-      return
-    }
-      }
-     })
-    })
-  })
-  
-  delBtn.forEach((del, i) => {
-    const subTotal = products[i].querySelector('.subtotal')
-    del.addEventListener('click', () => {
-      clearCart(i)
-    })
-  })
-  if (carts.length == 0) {
-    footText.textContent = ''
-    total.textContent = ''
-    span.textContent = "Nothing in cart yet!"
-  }
-  
-})
-function updateTotal() {
-  const newTotal = carts.reduce((acc,
-    item) => {
-    return acc + parseFloat(item.price
-      .slice(1)) * item.quantity
-  }, 0)
-  total.textContent = newTotal > 0 ?
-    `$${newTotal.toFixed(2)}` : ''
-  footText.textContent = newTotal > 0 ?
-    'Estimated Total:' : ''
-  cartSpan.textContent = newTotal > 0 ?
-    '' : 'Nothing in cart yet!'
-}
-
-cartContainer.addEventListener("click", (e) => {
-  const product = e.target.closest(".products")
-  if (!product) return
-  
-  const id = product.dataset.id
-  const item = carts.find(p => p.id == id)
-  if (!item) return
-  
-  const quantity = product.querySelector("input")
-  const price = product.querySelector(".price")
-  const subTotal = product.querySelector(".subtotal")
-  
-  if (e.target.classList.contains("add-icon")) {
-    item.quantity++
-  }
-  if (e.target.classList.contains("minus-icon")) {
-    item.quantity--
-    if (item.quantity <= 0) {
-      carts = carts.filter(p => p.id !== id)
-      renderCart(carts, cartContainer, total, footText, cartSpan)
-      setCarts(carts)
-      return
-    }
-  }
-  if (e.target.classList.contains("del-btn")) {
-    carts = carts.filter(p => p.id !== id)
-    renderCart(carts, cartContainer, total, footText, cartSpan)
-    setCarts(carts)
-    return
-  }
-  
-  quantity.value = item.quantity
-  subTotal.textContent = `$${(parseFloat(price.textContent.slice(1)) * item.quantity).toFixed(2)}`
-  updateTotal()
-  setCarts(carts)
+  bindCartEvents(carts, cartContainer, total, footText, cartSpan)
 })
