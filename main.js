@@ -36,7 +36,7 @@ function renderFavorites(arr = [], container, span) {
     node.innerHTML = `
       <div class="relative w-full img-container1 transition-all duration-500 mb-2">
         <img class="transition-all duration-1000" src="${product.image}" alt="" />
-        <i class="hearts1 fa-regular fa-heart text-xl text-red-500 absolute top-1 right-1 bg-white w-10 h-12 flex items-center justify-center transition-all duration-500 hidden"></i>
+        <i class="hearts1 heart-icon text-red-500 fa-regular fa-heart text-xl absolute top-1 right-1 bg-white w-10 h-12 flex items-center justify-center transition-all duration-500 hidden"></i>
       </div>
       <h4 class="text-xl w-full font-marcel text-white">${product.name}</h4>
       <div class="overflow-y-hidden h-6">
@@ -81,7 +81,7 @@ function renderCart(arr = [], container, total, footText, span) {
         <p class="text-white font-marcel w-12 text-center subtotal">
           $${(parseFloat(product.price.slice(1)) * product.quantity).toFixed(2)}
         </p>
-        <button class="del-btn w-16 h-7 text-center bg-black text-sm text-white rounded font-marcel">Delete</button>
+        <i class="fa-solid fa-trash del-btn text-xl text-center text-white ml-2"></i>
       </div>
     `
     container.appendChild(div)
@@ -202,6 +202,7 @@ function refreshUI() {
   if (favoritesContainer && favSpan) {
     renderFavorites(favorites, favoritesContainer, favSpan)
   }
+    
 }
 // ===============================
 // GLOBAL VARIABLES FOR SLIDERS
@@ -233,12 +234,19 @@ document.addEventListener("visibilitychange", () => {
 // ===============================
 // INTERACTION HELPERS
 // ===============================
-function clickedProduct(e, addCarts, hideCashes, imgContainers, heartIcons) {
-  addCarts.forEach(cart => cart.classList.remove('translate-y-[-23px]'))
-  hideCashes.forEach(cash => cash.classList.remove('translate-y-[-20px]'))
-  imgContainers.forEach(contain => contain.classList.remove('scale-[0.9]'))
-  heartIcons.forEach(heart => heart.classList.add('hidden'))
-}
+  function resetProductSize() {
+    for (let i = 1; i < 4; i++) {
+      const addCarts = document.querySelectorAll(`.add-cart${i}`)
+      const hideCashes = document.querySelectorAll(`.hide-cash${i}`)
+      const imgContainers = document.querySelectorAll(`.img-container${i}`)
+      const heartIcons = document.querySelectorAll(`.hearts${i}`)
+        
+      addCarts.forEach(cart => cart.classList.remove('translate-y-[-23px]'))
+      hideCashes.forEach(cash => cash.classList.remove('translate-y-[-20px]'))
+      imgContainers.forEach(contain => contain.classList.remove('scale-[0.9]'))
+      heartIcons.forEach(heart => heart.classList.add('hidden'))
+    }
+  }
 
 function enableClick(fav = [], container, span) {
   // PRODUCT CLICK HANDLERS (1, 2, 3)
@@ -253,8 +261,9 @@ function enableClick(fav = [], container, span) {
         
         if (hideCash.classList.contains('translate-y-[-20px]')) {
           if (e.target == heartIcon) {
-            e.target.classList.toggle('text-red-500')
             e.target.classList.remove('hidden')
+            e.target.classList.toggle('text-red-500')
+            
             const productData = {
               id: product.dataset.id,
               name: product.querySelector('h4').textContent,
@@ -267,17 +276,21 @@ function enableClick(fav = [], container, span) {
             }
             if (!e.target.classList.contains('text-red-500')) {
               if (fav.length > 0) {
+               if (container) {
                 fav.filter(item => {
-                  if (item.id == product.dataset.id) {
-                    let removedFav = container.querySelector(`[data-id="${item.id}"]`)
-                    container.removeChild(removedFav)
-                  }
+                if (item.id == product.dataset.id) {
+                let removedFav = container.querySelector(`[data-id="${item.id}"]`)
+                container.removeChild(removedFav)
+                 }
                 })
+               }
                 fav = fav.filter(item => item.id !== product.dataset.id)
                 setFavorites(fav)
               }
               if(fav.length == 0){
-                span.textContent = "No favorites yet!";
+                if (span) {
+                span.textContent = "No favorites yet!";      
+                }
               }
             }
             return
@@ -299,34 +312,29 @@ function enableClick(fav = [], container, span) {
             }
             setCarts(carts)
           }
+          resetProductSize()
+          setTimeout(() => {
+            
+          }, 500)
         } else {
           const addCarts = document.querySelectorAll(`.add-cart${i}`)
           const hideCashes = document.querySelectorAll(`.hide-cash${i}`)
           const imgContainers = document.querySelectorAll(`.img-container${i}`)
           const heartIcons = document.querySelectorAll(`.hearts${i}`)
-          clickedProduct(e, addCarts, hideCashes, imgContainers, heartIcons)
+          resetProductSize()
           hideCash.classList.add('translate-y-[-20px]')
           addCart.classList.add('translate-y-[-23px]')
           imgContainer.classList.add('scale-[0.9]')
           heartIcon.classList.remove('hidden')
+
         }
       })
     })
   }
-  
+
   // DOCUMENT CLICK RESET
   document.addEventListener('click', () => {
-    for (let i = 1; i < 4; i++) {
-      const addCarts = document.querySelectorAll(`.add-cart${i}`)
-      const hideCashes = document.querySelectorAll(`.hide-cash${i}`)
-      const imgContainers = document.querySelectorAll(`.img-container${i}`)
-      const heartIcons = document.querySelectorAll(`.hearts${i}`)
-      
-      addCarts.forEach(cart => cart.classList.remove('translate-y-[-23px]'))
-      hideCashes.forEach(cash => cash.classList.remove('translate-y-[-20px]'))
-      imgContainers.forEach(contain => contain.classList.remove('scale-[0.9]'))
-      heartIcons.forEach(heart => heart.classList.add('hidden'))
-    }
+   resetProductSize()
   })
 }
 
@@ -431,7 +439,8 @@ document.addEventListener("DOMContentLoaded", () => {
   cartIcon.addEventListener('click', () => {
     window.location.href = 'cart.html'
   })
-  
+  const favoritesContainer = document.querySelector('.favorites-container')
+  const favSpan = document.querySelector('span')
   enableClick(favorites)
 
   // HERO SECTION ANIMATIONS
@@ -518,6 +527,7 @@ document.addEventListener("DOMContentLoaded", () => {
           productTrack.style.transform = `translateX(0px)`
           slideDots.forEach(dot => dot.classList.remove('bg-stone-400'))
           slideDots[0].classList.add('bg-stone-400')
+          resetProductSize()
         }
         
         testimonialsTrack.style.transition = 'transform 0.6s ease'
