@@ -335,6 +335,12 @@ function enableClick(fav = [], container, span) {
         }
       })
     })
+  // I ENSURED THAT THE FAVOURITES THAT HAVE BEEN CLICKED NAINTAINED PERSISTENCE
+    fav.forEach(item => {
+    let product = document.querySelector(`[data-id="${item.id}"]`)
+    let heart = product.querySelector('.fa-heart')
+    heart.classList.add('text-red-500')
+  })
   }
 
   // DOCUMENT CLICK RESET
