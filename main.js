@@ -251,7 +251,7 @@ document.addEventListener("visibilitychange", () => {
 function enableClick(fav = [], container, span) {
   // PRODUCT CLICK HANDLERS (1, 2, 3)
   for (let i = 1; i < 4; i++) {
-    document.querySelectorAll(`.products${i}`).forEach(product => {
+    document.querySelectorAll(`.products${i}`).forEach((product,h) => {
       product.addEventListener('click', (e) => {
         e.stopPropagation()
         let addCart = product.querySelector(`.add-cart${i}`)
@@ -313,9 +313,14 @@ function enableClick(fav = [], container, span) {
             setCarts(carts)
           }
           resetProductSize()
+          let p = document.createElement('p')
+          p.classList.add('absolute', 'top-1','right-1','rounded-md','p-1','bg-green-500','text-white','font-marcel','w-20','text-center','font-bold')
+          p.textContent = 'Added'
+          let container = product.querySelector(`.img-container${i}`)
+          container.appendChild(p)
           setTimeout(() => {
-            
-          }, 500)
+          container.removeChild(p) 
+          }, 800)
         } else {
           const addCarts = document.querySelectorAll(`.add-cart${i}`)
           const hideCashes = document.querySelectorAll(`.hide-cash${i}`)
