@@ -335,7 +335,7 @@ function enableClick(fav = [], container, span) {
         }
       })
     })
-  // I ENSURED THAT THE FAVOURITES THAT HAVE BEEN CLICKED NAINTAINED PERSISTENCE
+  // I ENSURED THAT THE FAVOURITES THAT HAVE BEEN CLICKED MAINTAINED PERSISTENCE
     fav.forEach(item => {
     let product = document.querySelector(`[data-id="${item.id}"]`)
     let heart = product.querySelector('.fa-heart')
